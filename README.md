@@ -33,7 +33,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
 
 ## References
-Papili Gao N., Hartmann T., Fang T., and Gunawan R., CALISTA: Clustering And Lineage Inference in Single Cell Transcriptional Analysis, in preparation. [Abstract]()
+Papili Gao N., Hartmann T. and Gunawan R., CALISTA: Clustering And Lineage Inference in Single Cell Transcriptional Analysis, in preparation. [Abstract]()
 
 ## Acknowledgement
 This work is supported by funding from Swiss National Science Foundation.
