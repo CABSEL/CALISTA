@@ -21,11 +21,11 @@ Current version: 1.0 (1.03.2018)
 ## Download and Installation
 
 CALISTA (MATLAB version):    
-Download and unzip the [CALISTA-Matlab_v1.0.zip](https://github.com/CABSEL/CALISTA.git) for codes and data.
+Download and unzip the [CALISTA-MATLAB v1.0.zip](https://github.com/CABSEL/CALISTA.git) for codes and data.
 
 CALISTA-R (R version):     
-##### UNDER REVISION- R distribution of CALISTA will be available soon. 
-Download and unzip the [CALISTA-R_v1.0.zip]() for codes and data
+#### UNDER REVISION- R distribution of CALISTA will be available soon. 
+Download and unzip the [CALISTA-R v1.0.zip]() for codes and data
 
 ## License
 Redistribution and use in source and binary forms, with or without modification, are permitted provided agreeing to the BSD 3-Clause Style [License](https://github.com/CABSEL/CALISTA/blob/master/LICENSE).
