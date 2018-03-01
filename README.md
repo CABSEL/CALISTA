@@ -1,24 +1,22 @@
 <img style = "float: right;" src = "https://github.com/CABSEL/CALISTA/blob/master/calista.png">
 
-CALISTA is a user-friendly toolbox for the analysis of single cell expression data. CALISTA computes four major tasks: 
+CALISTA provides a user-friendly toolbox for the analysis of single cell expression data. CALISTA accomplishes three major tasks: 
 
- 1. Identify and characterize different cell types within a heterogeneous population
+(1)	Identification of cell clusters in a cell population based on single-cell gene expression data; 
 
- 2. Reconstruct the lineage relationships
- 
- 3. Detect the key genes involved in cell-fate transition events
+(2)	Reconstruction of lineage progression and produce transition genes;
 
- 4. Order individual cells along the reconstructed developmental topology
+(3)	Pseudotemporal ordering of cells along any given developmental paths in the lineage progression.
 
 
 ## System Requirements
 
-CALISTA toolbox is originally written for MATLAB. The subroutines in CALISTA (version 1.0) have been successfully tested on MATLAB 2016b and 2017a. 
+CALISTA toolbox is originally written for MATLAB. The subroutines in CALISTA (version 1.0) have been successfully tested on MATLAB 2016b,  2017a and 2018a. 
 
 CALISTA-R toolbox is also provided for R users. The subroutines in CALISTA (version 1.0) have been successfully tested on R version 3.4.2 and RStudio Version 1.1.383
 
 ## Last Update
-Current version: 1.0 (26.01.2018)
+Current version: 1.0 (1.03.2018)
 
 ## Download and Installation
 
