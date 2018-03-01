@@ -21,12 +21,12 @@ CALISTA-R toolbox is also provided for R users. The subroutines in CALISTA (vers
 Current version: 1.0 (26.01.2018)
 
 ## Download and Installation
-### UNDER REVISION- CALISTA toolbox will be available soon. 
 
 CALISTA (MATLAB version):    
 Download and unzip the [CALISTA-Matlab_v1.0.zip]() for codes and data.
 
 CALISTA-R (R version):     
+##### UNDER REVISION- R distribution of CALISTA will be available soon. 
 Download and unzip the [CALISTA-R_v1.0.zip]() for codes and data
 
 ## License
