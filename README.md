@@ -23,7 +23,7 @@ Current version: 1.0 (26.01.2018)
 ## Download and Installation
 
 CALISTA (MATLAB version):    
-Download and unzip the [CALISTA-Matlab_v1.0.zip]() for codes and data.
+Download and unzip the [CALISTA-Matlab_v1.0.zip](https://github.com/CABSEL/CALISTA.git) for codes and data.
 
 CALISTA-R (R version):     
 ##### UNDER REVISION- R distribution of CALISTA will be available soon. 
@@ -34,7 +34,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
 
 ## References
-Papili Gao N., Hartmann T. and Gunawan R., CALISTA: Clustering And Lineage Inference in Single Cell Transcriptional Analysis, in preparation. [Abstract]()
+Papili Gao N., Hartmann T. and Gunawan R., CALISTA: Clustering And Lineage Inference in Single Cell Transcriptional Analysis. [Abstract](https://www.biorxiv.org/content/early/2018/01/31/257550)
 
 ## Acknowledgement
 This work is supported by funding from Swiss National Science Foundation.
