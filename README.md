@@ -16,11 +16,11 @@ CALISTA toolbox is originally written for MATLAB. The subroutines in CALISTA (ve
 CALISTA-R toolbox is also provided for R users. The subroutines in CALISTA (version 1.0) have been successfully tested on R version 3.4.2 and RStudio Version 1.1.383
 
 ## Last Update
-Current version: 1.0 (1.03.2018)
+Current version: CALISTA-MATLAB v1.1 (05.03.2018)   CALISTA-R v1.0 (05.03.2018)
 
 ## Download and Installation
 
-CALISTA (MATLAB version):    
+CALISTA-MATLAB (MATLAB version):    
 Download and unzip the [CALISTA-MATLAB v1.1.zip](https://github.com/CABSEL/CALISTA.git) for codes and data.
 
 CALISTA-R (R version):     
