@@ -1,0 +1,87 @@
+if(!(require("destiny"))){
+  ## try http:// if https:// URLs are not supported
+  source("https://bioconductor.org/biocLite.R")
+  biocLite("destiny")
+}
+if(!(require("R.matlab"))){
+  install.packages("R.matlab")
+}
+if(!(require("doParallel"))){
+  install.packages("doParallel")
+}
+if(!(require("foreach"))){
+  install.packages("foreach")
+}
+if(!(require("Matrix"))){
+  install.packages("Matrix")
+}
+if(!(require("ClusterR"))){
+  install.packages("ClusterR")
+}
+if(!(require("cluster"))){
+  install.packages("cluster")
+}
+if(!(require("tsne"))){
+  install.packages("tsne")
+}
+if(!(require("expm"))){
+  install.packages("expm")
+}
+if(!(require("Rcpp"))){
+  install.packages("Rcpp")
+}
+if(!(require("xlsx"))){
+  install.packages("xlsx")
+}
+if(!(require("data.table"))){
+  install.packages("data.table")
+}
+if(!(require("tools"))){
+  install.packages("tools")
+}
+if(!(require("scatterplot3d"))){
+  install.packages("scatterplot3d")
+}
+if(!(require("plot3D"))){
+  install.packages("plot3D")
+}
+if(!(require("rgl"))){
+  install.packages("rgl")
+}
+if(!(require("ggplot2"))){
+  install.packages("ggplot2")
+}
+if(!(require("igraph"))){
+  install.packages("igraph")
+}
+if(!(require("tcltk2"))){
+  install.packages("tcltk2")
+}
+if(!(require("gridExtra"))){
+  install.packages("gridExtra")
+}
+if(!(require("primes"))){
+  install.packages("primes")
+}
+if(!(require("numbers"))){
+  install.packages("numbers")
+}
+if(!(require("matrixStats"))){
+  install.packages("matrixStats")
+}
+if(!(require("TTR"))){
+  install.packages("TTR")
+}
+if(!(require("ppcor"))){
+  install.packages("ppcor")
+}
+if(!(require("Hmisc"))){
+  install.packages("Hmisc")
+}
+if(!(require("fields"))){
+  install.packages("fields")
+}
+
+if(!(require("gplots"))){
+install.packages("gplots")
+}
