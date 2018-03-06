@@ -9,7 +9,7 @@ Plot_cluster_mean_exp<-function(Results,DATA){
     MEAN[,i]=rowMeans(D[[i]])
   }
   
-  #x11(title = 'ploting  meean gene expression')
+  #x11(title = 'Plotting  mean gene expression')
   #par(mfrow=c(p1,p1))
   for(j in 1:DATA$numGENES){
     gg_data=data.frame()

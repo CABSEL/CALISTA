@@ -4,7 +4,7 @@ normalization <-function(data_type,format_data,perczeros_genes,perczeros_cells,c
   #imported_temp=read.xlsx(filename,1)  # in matlab code, imported_data.data is data, imported_data.text data is first line
   filetype=file_ext(filename)
   if(filetype=='xlsx'){
-    imported_temp=read.xlsx(filename,1,header = FALSE)
+    imported_temp=read.xlsx(filename,1,rowNames = FALSE)
     imported_temp=na.omit(imported_temp)
   }else 
   {
@@ -111,6 +111,7 @@ normalization <-function(data_type,format_data,perczeros_genes,perczeros_cells,c
             timeline=unname(timeline)
           },
           {
+            #5
             writeLines("IMPORTED DATA preview:\n\n")
             print(imported_temp[1:5,1:10])
             writeLines(paste("Dimension of IMPORTED DATA:\n",
@@ -120,7 +121,7 @@ normalization <-function(data_type,format_data,perczeros_genes,perczeros_cells,c
             writeLines("Press 1 if columns=genes, 0 otherwise (e.g. 1):")
             genes_vector=as.integer(readLines(n=1))
             if(genes_vector){
-              writeLines("Key the starting coloumn for expression data (e.g. 6):")
+              writeLines("Key the starting column for expression data (e.g. 6):")
               start_genes=as.integer(readLines(n=1))
               writeLines("Selected EXPRESSION DATA preview:\n\n")
               print(imported_temp[1:nrow(imported_temp),start_genes:ncol(imported_temp)][1:5,1:10])
@@ -134,7 +135,7 @@ normalization <-function(data_type,format_data,perczeros_genes,perczeros_cells,c
             }else{
               writeLines("key the starting row for expression data (e.g. 1):")
               start_genes=as.integer(readLines(n=1))
-              print(imported_temp[start_genes:nrow(imported_temp),2:ncol(imported_temp)])
+              print(imported_temp[start_genes:nrow(imported_temp),2:ncol(imported_temp)][1:5,1:10])
               print(dim(imported_temp[start_genes:nrow(imported_temp),2:ncol(imported_temp)]))
               NUM=imported_temp[start_genes:nrow(imported_temp),2:ncol(imported_temp)]
               TXT=imported_temp[,1]
@@ -345,6 +346,7 @@ normalization <-function(data_type,format_data,perczeros_genes,perczeros_cells,c
     }
   }
   DATA$singleCELLdata=data
+  DATA$imported_data=imported_temp
   return(DATA)
 }
 
