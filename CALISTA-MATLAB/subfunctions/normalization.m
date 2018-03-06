@@ -284,4 +284,5 @@ DATA.totDATA(isnan(totDATA)) = 0 ;
 
 data= mat2cell(DATA.totDATA',DATA.numGENES,cutDIMENSION);% now rows=genes and columns=cells
 DATA.singleCELLdata=data;
+DATA.imported_data=imported_data;
 end
