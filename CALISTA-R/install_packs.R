@@ -30,8 +30,8 @@ if(!(require("expm"))){
 if(!(require("Rcpp"))){
   install.packages("Rcpp")
 }
-if(!(require("xlsx"))){
-  install.packages("xlsx")
+if(!(require("openxlsx"))){
+  install.packages("openxlsx")
 }
 if(!(require("data.table"))){
   install.packages("data.table")
