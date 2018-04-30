@@ -11,9 +11,9 @@ CALISTA provides a user-friendly toolbox for the analysis of single cell express
 
 ## System Requirements
 
-CALISTA toolbox is originally written for MATLAB. The subroutines in CALISTA (version 1.0) have been successfully tested on MATLAB 2016b,  2017a and 2018a. 
+CALISTA toolbox is originally written for MATLAB. The subroutines in CALISTA (version 1.1.2) have been successfully tested on MATLAB 2016b,  2017a and 2018a. 
 
-CALISTA-R toolbox is also provided for R users. The subroutines in CALISTA (version 1.0) have been successfully tested on R version 3.4.2 and RStudio Version 1.1.383
+CALISTA-R toolbox is also provided for R users. The subroutines in CALISTA (version 1.0.2) have been successfully tested on R version 3.4.2 and RStudio Version 1.1.383
 
 ## Last Update
 Current version: CALISTA-MATLAB v1.1.2 (30.04.2018)   CALISTA-R v1.0.2 (30.04.2018)
