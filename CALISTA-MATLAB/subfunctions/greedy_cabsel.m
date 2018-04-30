@@ -7,6 +7,7 @@ if display && loops>1
     fprintf('Progress:');
     fprintf(['\n' repmat('.',1,loops) '\n\n']);
 end
+
 parfor (jj=1:loops,p)
     % for jj=1:loops
     as=as_all(jj,:);
@@ -44,6 +45,7 @@ parfor (jj=1:loops,p)
             % if cluster has only one entry
             if bounds(clust,1)==bounds(clust,2)
                 idx = sub2ind(size(num_cells_mRNA),cells_in_each_cluster+1, 1:n_genes);
+                num_cells_mRNA=zeros(max_mRNA_counts+1,n_genes);
                 num_cells_mRNA(idx)=1;
             else
                 % number of cells with mRNA count
@@ -69,51 +71,50 @@ parfor (jj=1:loops,p)
         % vector for the cell probabilities in each cluster
         cell_prob=zeros(nvars,num_clusters);
         my_distance=cell_prob;
-        % loop over all cells
-        for i=1:nvars
-            
-            % loop over cluster
-            for clust=1:num_clusters
-                % loop over genes
-                for j=1:n_genes
-                    % calculate the lop prob of gene in cell belonging
-                    % to cluster
-                    opt_param_each_gene=log_p_mat_ma(:,opt_idx_clusters(clust,j));
-                    % sum all genes together
-                    cell_prob(i,clust)=cell_prob(i,clust)+opt_param_each_gene(mRNA_all(i,j)+1);
-                end
-            end
-            
-            % switch between algortihm chosen by the user
-            switch algorithm
-                % just go for the maximum
-                case 'greedy_cabsel'
-                    [sum_prob,idx_max_cell_prob(i)]=max(cell_prob(i,:));
-                    sum_prob_tot(jj)=sum_prob_tot(jj)+sum_prob;
-                    maxrel=1;
-                    % go for the maxiumum difference between clusters
-                case 'greedy_maxdiff'
-                    [sum_prob,idx_max_cell_prob(i)]=max(cell_prob(i,:)-sum(cell_prob(i,:)));
-                    sum_prob_tot(jj)=sum_prob_tot(jj)+sum_prob;
-                    maxrel=1;
-                    % maximum difference and flip coin, aneal, etc. code sabec
-                case 'cabsel_sabec'
-                    maxrel=0.95;
-                    p_temp=(cell_prob(i,:)-sum(cell_prob(i,:)));
-                    p_temp=p_temp./sum(p_temp);
-                    p_temp=p_temp.^(10*iterations);
-                    % check if all the probabilities are zeros
-                    my_zeros=find(p_temp<0);
-                    p_temp(my_zeros)=0;
-                    % if all zeros keep old assignmnet
-                    if sum(p_temp)==0
-                        idx_max_cell_prob(i)=as(i);
-                    else
-                        idx_max_cell_prob(i)=randsample(expected_clusters,1,true,p_temp);
-                    end
-                    
-            end
+%                 % loop over all cells
+%                 for i=1:nvars
+%         
+%                     % loop over cluster
+%                     for clust=1:num_clusters
+%                         % loop over genes
+%                         for j=1:n_genes
+%                             % calculate the lop prob of gene in cell belonging
+%                             % to cluster
+%                             opt_param_each_gene=log_p_mat_ma(:,opt_idx_clusters(clust,j));
+%                             % sum all genes together
+%                             cell_prob(i,clust)=cell_prob(i,clust)+opt_param_each_gene(mRNA_all(i,j)+1);
+%                         end
+%                     end
+%         
+%                     [sum_prob,idx_max_cell_prob(i)]=max(cell_prob(i,:));
+%                     sum_prob_tot(jj)=sum_prob_tot(jj)+sum_prob;
+%                     maxrel=1;
+%         
+%                 end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        temp_mRNA_all=mRNA_all+1;
+        opt_param_each_gene=reshape(log_p_mat_ma(:,opt_idx_clusters'),max_mRNA_counts+1,n_genes,num_clusters);
+        for j=1:n_genes
+            cell_prob=cell_prob+squeeze(opt_param_each_gene(temp_mRNA_all(:,j),j,:));
         end
+        
+        
+        switch algorithm
+            % just go for the maximum
+            case 'greedy_cabsel'
+                [sum_prob,idx_max_cell_prob]=max(cell_prob,[],2);
+                idx_max_cell_prob=idx_max_cell_prob';
+                sum_prob_tot(jj)=sum(sum_prob);
+                maxrel=1;
+                % go for the maxiumum difference between clusters
+            case 'greedy_maxdiff'
+                [sum_prob,idx_max_cell_prob]=max(cell_prob-repmat(sum(cell_prob,2),1,expected_clusters),[],2);
+                sum_prob_tot(jj)=sum_prob_tot(jj)+sum_prob;
+                maxrel=1;
+                % maximum difference and flip coin, aneal, etc. code sabec
+                          
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         % check how many swaps
         comp=as==idx_max_cell_prob;
@@ -164,7 +165,7 @@ if optimize==true
     my_results.population=population;
     my_results.best=best_as;
     my_results.overallsum=sum_prob_tot;
-%     my_results.clusterprobabilities=clusterprobabilities;
+    %     my_results.clusterprobabilities=clusterprobabilities;
     
     opt_id=opt_idx_a(indx_best).run;
     for j=1:size(opt_id,1)
@@ -174,8 +175,8 @@ if optimize==true
     
 else
     my_results.population=[];
-%     my_results.best=as;
-%     my_results.clusterprobabilities=clusterprobabilities;
+    %     my_results.best=as;
+    %     my_results.clusterprobabilities=clusterprobabilities;
     opt_id=opt_idx_a.run;
     for j=1:size(opt_id,1)
         optpar(j,:)={k_new(opt_id(j,:),:)};
