@@ -53,8 +53,8 @@ Plot_cluster_mean_exp<-function(Results,DATA){
   #grid.arrange(grobs=p_ggplot)
   #x11()
   ml=marrangeGrob(grobs = p_ggplot,ncol = 2,nrow = 2)
-  ggsave("ploting  meean gene expression.pdf",ml)
-  writeLines('\n finished! You can find it in "ploting  meean gene expression.pdf" in current working directory  \n')
+  ggsave("Plotting  mean gene expression.pdf",ml)
+  writeLines('\n Done! Mean gene expression plot is saved in "Plotting  mean gene expression.pdf" in current working directory  \n')
   Results$singleCellClusterDATA=D
   return(Results)
 
