@@ -1,7 +1,9 @@
  greedy_cabsel<-function(as_all,log_p_mat_ma,K_new,mRNA_all,n_genes,max_iter,nvars,
                             optimize,opt_idx_a,p,sum_prob_tot,population,loops,expected_clusters,algorithm,display){
-  ####3=test
-   #my_results=greedy_cabsel(as_all,log_p_mat_ma,K_new,mRNA_all,n_genes,max_iter,nvars,optimize,opt_idx_a,p,sum_prob_tot,in_population,loops,expected_clusters,algorithm,display)
+  
+   ####3=test
+   #greedy_cabsel(as_all,log_p_mat_ma,K_new,mRNA_all,n_genes,max_iter,nvars,
+   #optimize,opt_idx_a,p,sum_prob_tot,in_population,loops,expected_clusters,algorithm,display)
    
   #population=in_population 
   ### some explanation
@@ -88,43 +90,78 @@
       idx_max_cell_prob=matrix(0,nrow = 1,ncol = nvars)
       cell_prob=matrix(0,nrow = nvars,ncol = num_clusters)
       my_distance=cell_prob
-      for(i in 1:nvars){
-        # cell_prob[i,]=sapply(1:ncol(cell_prob),function(clust){
-        #   sum(sapply(1:n_genes,function(j){log_p_mat_ma[,opt_idx_clusters[clust,j]][mRNA_all[i,j]+1]}))
-        # })
-      cell_i=cell_prob[i,]
-      ii=i-1
-      cell_prob[i,]=up_cell(cell_i,opt_idx_clusters,log_p_mat_ma,mRNA_all,num_clusters,n_genes,ii)
-        switch (algorithm,
+      #----------------
+      # for(i in 1:nvars){
+      #   # cell_prob[i,]=sapply(1:ncol(cell_prob),function(clust){
+      #   #   sum(sapply(1:n_genes,function(j){log_p_mat_ma[,opt_idx_clusters[clust,j]][mRNA_all[i,j]+1]}))
+      #   # })
+      # cell_i=cell_prob[i,]
+      # ii=i-1
+      # cell_prob[i,]=up_cell(cell_i,opt_idx_clusters,log_p_mat_ma,mRNA_all,num_clusters,n_genes,ii)
+      #   
+      # switch (algorithm,
+      #     'greedy_cabsel' = {
+      #       sum_prob=max(cell_prob[i,])
+      #       idx_max_cell_prob[i]=which(cell_prob[i,]==sum_prob)[1]  #alway notice that, not just one max value 
+      #       sum_prob_tot[jj]=sum_prob_tot[jj]+sum_prob #this is different as matlab
+      #       
+      #       maxrel=1
+      #     },
+      #     'greedy_maxdiff'={
+      #       tmp=cell_prob[i,]-sum(cell_prob[i,])
+      #       sum_prob=max(tmp)
+      #       idx_max_cell_prob[i]=which(tmp==sum_prob)
+      #       sum_prob_tot[jj]=sum_prob_tot[jj]+sum_prob
+      #       maxrel=1
+      #     },
+      #     'cabsel_sabec'={
+      #       maxrel=0.95
+      #       p_temp=cell_prob[i,]-sum(cell_prob[i,])
+      #       p_temp=p_temp/sum(p_temp)
+      #       p_temp=p_temp^(10*iterations)
+      #       my_zeros=which((p_temp<0)==TRUE)
+      #       p_temp[my_zeros]=0
+      #       if(sum(p_temp)==0){
+      #         idx_max_cell_prob[i]=as[i]
+      #       }else{
+      #         idx_max_cell_prob[i]=sample(expected_clusters,1,TRUE,p_temp)
+      #       }
+      #     }
+      #   )
+      # }
+      #----------------------------
+      temp_mRNA_all=mRNA_all+1
+      opt_idx_clusters_list=unlist(lapply(1:nrow(opt_idx_clusters), function(j) opt_idx_clusters[j,]) )
+      opt_param_each_gene=array(log_p_mat_ma[,opt_idx_clusters_list],dim=c(max_mRNA_counts+1,n_genes,num_clusters))
+      for(j in 1:n_genes){
+        cell_prob=cell_prob+opt_param_each_gene[temp_mRNA_all[,j],j,]
+      }
+      
+      switch (algorithm,
           'greedy_cabsel' = {
-            sum_prob=max(cell_prob[i,])
-            idx_max_cell_prob[i]=which(cell_prob[i,]==sum_prob)[1]  #alway notice that, not just one max value 
-            sum_prob_tot[jj]=sum_prob_tot[jj]+sum_prob #this is different as matlab
-            
+            sum_prob=apply(cell_prob,1,max)
+            idx_max_cell_prob=apply(cell_prob,1,function(x){
+              which(x==max(x))[1]
+            })  #alway notice that, not just one max value
+            #idx_max_cell_prob=matrix(0,nrow = 1,ncol = nvars)
+            #idx_max_cell_prob=matrix(idx_max_cell_prob,nrow = 1,ncol = nvars)
+            sum_prob_tot[jj]=sum(sum_prob) #this is different as matlab
+
             maxrel=1
           },
           'greedy_maxdiff'={
-            tmp=cell_prob[i,]-sum(cell_prob[i,])
-            sum_prob=max(tmp)
-            idx_max_cell_prob[i]=which(tmp==sum_prob)
+            tmp=cell_prob-matrix(rep(rowSums(cell_prob),expected_clusters),ncol = expected_clusters,byrow = FALSE)
+            sum_prob=apply(tmp,1,max)
+            idx_max_cell_prob=apply(tmp,1,function(x){
+              which(x==max(x))[1]
+            }) 
+            #idx_max_cell_prob=matrix(idx_max_cell_prob,nrow = 1,ncol = nvars)
             sum_prob_tot[jj]=sum_prob_tot[jj]+sum_prob
             maxrel=1
-          },
-          'cabsel_sabec'={
-            maxrel=0.95
-            p_temp=cell_prob[i,]-sum(cell_prob[i,])
-            p_temp=p_temp/sum(p_temp)
-            p_temp=p_temp^(10*iterations)
-            my_zeros=which((p_temp<0)==TRUE)
-            p_temp[my_zeros]=0
-            if(sum(p_temp)==0){
-              idx_max_cell_prob[i]=as[i]
-            }else{
-              idx_max_cell_prob[i]=sample(expected_clusters,1,TRUE,p_temp)
-            }
           }
         )
-      }
+      
+      
       opt_when_false$sum_pro_tot_jj=sum_prob_tot[jj]
       comp=(as==idx_max_cell_prob)
       rel=sum(comp)
@@ -134,6 +171,7 @@
       #print(rel/nvars)
       #print(as)
       #print(idx_max_cell_prob)
+      opt_when_false$population_jj=population[jj,]
       if(rel/nvars>=maxrel || optimize==FALSE){
         #print('rel/nvars>=maxrel')
         #print(rel/nvars>=maxrel)
