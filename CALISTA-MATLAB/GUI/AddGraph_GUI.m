@@ -1,4 +1,4 @@
-function [h,NumberOfEdges,IDXCOLORMARK3]=AddGraph_GUI(cluster_distance,colorMARK2,x_center,y_center,z_center,ClusterGroup2,expected_clusters,normed_pseudotime,score3,legendInfo,checked_boxes)
+function [h,NumberOfEdges]=AddGraph_GUI(cluster_distance,colorMARK2,x_center,y_center,z_center,checked_boxes)
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
 h=[];
@@ -18,15 +18,15 @@ if ~isempty(checked_boxes)
     
     
     
-%     for k=1:expected_clusters
-%         scatter3(normed_pseudotime(ClusterGroup2==k)',score3(ClusterGroup2==k,1),score3(ClusterGroup2==k,2),30,colorMARK2(k,:),'fill')
-%         hold on
-%     end
-%     legend(legendInfo,'Location', 'northeast')
-%     xlabel('Cluster pseudotime')
-%     ylabel('COMP1')
-%     zlabel('COMP2')
-%     grid on
+    %     for k=1:expected_clusters
+    %         scatter3(normed_pseudotime(ClusterGroup2==k)',score3(ClusterGroup2==k,1),score3(ClusterGroup2==k,2),30,colorMARK2(k,:),'fill')
+    %         hold on
+    %     end
+    %     legend(legendInfo,'Location', 'northeast')
+    %     xlabel('Cluster pseudotime')
+    %     ylabel('COMP1')
+    %     zlabel('COMP2')
+    %     grid on
     
     p=plot(h,'EdgeLabel',h.Edges.Weight);
     % view([az,el])
@@ -41,11 +41,11 @@ if ~isempty(checked_boxes)
     p.ZData=z_center;
     p.NodeLabel=[];
     p.EdgeLabel=abs(h.Edges.Weight);
-%     colorMARK3=pink(size(cluster_distance,1));
-%     [~,IDXCOLORMARK3]=ismember(h.Edges.Weight,cluster_distance(:,3));
-%     colorMARK3=colorMARK3(1:size(h.Edges,1),:);
+    %     colorMARK3=pink(size(cluster_distance,1));
+    %     [~,IDXCOLORMARK3]=ismember(h.Edges.Weight,cluster_distance(:,3));
+    %     colorMARK3=colorMARK3(1:size(h.Edges,1),:);
     % colorMARK3=flipud(colorMARK3);
-%     p.EdgeColor=colorMARK3(IDXCOLORMARK3,:);
+    %     p.EdgeColor=colorMARK3(IDXCOLORMARK3,:);
     
 end
 end
