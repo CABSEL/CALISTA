@@ -1,17 +1,18 @@
 function Results=plot_cluster_mean_exp(DATA,Results)
 
 fprintf('\nPlotting mean gene expressions...\n')
-p=numSubplots(DATA.numGENES);
+top_genes_plot=min(DATA.numGENES,50);
+p=numSubplots(top_genes_plot);
 for i=1:Results.expected_clusters
-    D{i}=DATA.totDATA(find(Results.final_groups==i),:)';
+    D{i}=DATA.totDATA(find(Results.final_groups==i),1:top_genes_plot)';
     MEAN(:,i)=mean(D{i},2);
     %        MEDIAN(:,i)=median(singleCELLdata{i},2);
 %     SD(:,i)=std(D{i},[],2);
 end
 
 
-figure('position', [500, 500, 800, 800]) 
-for j=1:DATA.numGENES
+figure%('position', [500, 500, 800, 800]) 
+for j=1:top_genes_plot
     subplot(p(1),p(2),j)
     
     for i=1:Results.expected_clusters

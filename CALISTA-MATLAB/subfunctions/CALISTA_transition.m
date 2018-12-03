@@ -78,7 +78,7 @@ if ishandle(101)
 clf(101)
 end
 hfig=figure(101);
-set(hfig,'Position',[500, 500, 500, 500])
+% set(hfig,'Position',[500, 500, 500, 500])
 az=-37.5000;
 el=30;
 
@@ -242,6 +242,14 @@ if length(unique(DATA.timeline))==1 && unique(DATA.timeline)==0
         
     end
     h = reordernodes(h,order);
+    sorted_clust_idx=order;
+    if exist('sorted_clust_idx','var')
+         Results.clustering_struct.all.all.param_idx=Results.clustering_struct.all.all.param_idx(sorted_clust_idx,:);
+        temp=Results.clustering_struct.all.all.parameter;
+        for i=1:Results.expected_clusters
+            Results.clustering_struct.all.all.parameter{i}=temp{sorted_clust_idx(i)};
+        end
+    end
     
     Results.final_groups=final_groups2;
     Results.c=c2;
@@ -358,7 +366,7 @@ if ~isempty(proceed) & proceed==1
     
     close(102)
     hfig=figure(102);
-    set(hfig,'position', [500, 500, 500, 500])
+%     set(hfig,'position', [500, 500, 500, 500])
     az=-37.5000;
     el=30;
     for k=1:Results.expected_clusters
@@ -415,7 +423,7 @@ Results.mean_prob_in_out_cluster=mean_prob_in_out_cluster;
 %% Plot each predicted cluster separately
 p=numSubplots(length(unique(Results.cluster_progression)));
 stages_name=unique(Results.cluster_progression);
-figure('position', [500, 500, 800, 800])
+figure
 for K=1:length(stages_name)
     subplot(p(1),p(2),K)
     
@@ -484,7 +492,7 @@ if ~(length(unique(DATA.timeline))==1 && unique(DATA.timeline)==0) || isfield(Re
             
             ax=subplot(p(1),p(2),i);
             [~,ee]=ismember(aa,DATA.time);
-            pp=pie(ax,occurrence,cellstr(strcat('t ',num2str(aa))));
+            pp=pie(ax,occurrence,cellstr(strcat('t',num2str(aa))));
             hp = findobj(pp, 'Type', 'patch');
             for j=1:length(occurrence)
                 
@@ -492,7 +500,7 @@ if ~(length(unique(DATA.timeline))==1 && unique(DATA.timeline)==0) || isfield(Re
             end
             
             title(ax,sprintf( '%s %4i', 'Cluster', Results.cluster_predicted(i)))
-            
+            Results.pp=pp;
         end
     end
 end

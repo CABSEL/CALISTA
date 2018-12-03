@@ -1,11 +1,11 @@
-function [DATA]=import_data(INPUTS)
+function [DATA,INPUTS]=import_data(INPUTS)
 %IMPORT_DATA upload single-cell expression data and perform preprocessing
-% CALISTA accepts single-cell RTqPCR and RNA sequencing data. 
+% CALISTA accepts single-cell RTqPCR, RNA-seq, Drop-seq and DropNc-seq data. 
 % Besides the expression data matrix, users can also provide capture time 
 % or cell stage information. 
 %
 % Usage:
-% [DATA]=import_data(INPUTS)
+% [DATA,INPUTS]=import_data(INPUTS)
 % Upload and preprocess data using user-defined specifications
 % 
 % Input:
@@ -16,11 +16,10 @@ function [DATA]=import_data(INPUTS)
 % 1- for scRT-qPCR  (CT values)
 % 2- for scRT-qPCR  (Expression values - Num. mRNA molecules)
 % 3- for scRNA-seq  (Expression values - e.g log(TPM+1) or log(RPKM+1))
-% 4- for scRNA-seq  (Expression values - e.g TPM+1 or RPKM)
+% 4- for scRNA-seq  (Expression values - e.g TPM or RPKM)
+% 5- for Drop-seq and DropNc-seq (Expression values - e.g UMI or log(UMI+1))
 %
 % ** INPUTS.format_data **
-% Five data formats are accepted.
-%
 % 1- Rows= cells and Columns= genes with time/stage info in the last column  
 % ------------------------------------------
 % Gene1  Gene2  Gene3  ... Genej  Time/Stage
@@ -62,6 +61,18 @@ function [DATA]=import_data(INPUTS)
 %
 % 5- Manual selection from data table
 %
+% 6- (RECOMMENDED FOR Droplet-based datasets) File .mat containing the following variables:
+%    'expMatrix': NxG expression matrix with rows=cells and columns=genes;
+%    'cellID': cell array/character vector containing cell IDs (not required)
+%    'geneNAMES': cell array containing gene names (not required)
+%    'timeline': 1xN numerical vector containing the time information (not required)
+%
+% 7- (RECOMMENDED FOR Droplet-based datasets) File .mat containing the following variables:
+%    'expMatrix': NxG Log-expression matrix with rows=cells and columns=genes;
+%    'cellID': cell array/character vector containing cell IDs (not required)
+%    'geneNAMES': cell array containing gene names (not required)
+%    'timeline': 1xN numerical vector containing the time information (not required)
+%
 % ** INPUTS.data_selection **
 % When cells come from different capture times or stages, users can select 
 % cells from specific time or stage for further analysis by CALISTA. 
@@ -70,120 +81,153 @@ function [DATA]=import_data(INPUTS)
 % INPUTS.data_selection = [ ] or 1:4 for all time points/cells 
 % INPUTS.data_selection = 1          for cells the first time point
 % INPUTS.data_selection = [1 3 4]    for cells 1st, 3rd and 4th time points
+% By default: INPUTS.data_selection=[]
 % 
-% ** INPUTS.perczeros_genes **
-% Users can exclude genes with a certain percentage of zeros. 
-% INPUTS.perczeros_genes = 90 (recommended)
+% ** INPUTS.zeros_genes **
+% Gene filtering.
+% If INPUTS.zeros_genes is a value in the interval [0,1]=> Remove genes
+% with more than certain % of zeros (e.g. INPUTS.zeros_genes=0.9 -> 90%)
+% Otherwise Remove genes with more than INPUTS.zeros_genes zeros
+% By default:
+% if INPUTS.data_type<5 -> INPUTS.zeros_genes=1;
+% otherwise -> INPUTS.zeros_genes=3;
 %
-% ** INPUTS.perczeros_cells **
-% Users can exclude cells with more than a certain percentage of zeros.
-% INPUTS.perczeros_cells = 100 (recommended)
+% ** INPUTS.zeros_cells **
+% Cell filtering.
+% If INPUTS.zeros_cells is a value in the interval [0,1]=> Remove cells
+% with more than certain % of zeros (e.g. INPUTS.zeros_cells=1 -> 100%)
+% Otherwise Remove cells with more than INPUTS.zeros_cells zeros
+% By default:
+% if INPUTS.data_type<5 -> INPUTS.zeros_cells=1;
+% otherwise -> INPUTS.zeros_cells=200;
+%
+% ** INPUTS.cut_variable_genes **
+% Most variable gene selection.
+% Select X most variable genes with X=min(total number of genes,INPUTS.cut_variable_genes)
+% By default: INPUTS.cut_variable_genes = 1000 
+%
+% ** INPUTS.top_genes **
+% Top gene selection based on CALISTA.
+% If INPUTS.top_genes is a value in the interval [0,1]=> Select top Y of genes
+% with Y=round(INPUTS.top_genes*INPUTS.cut_variable_genes)(e.g. INPUTS.top_genes=0.9 -> 90% of INPUTS.cut_variable_genes)
+% Otherwise Select top Y genes with Y=min(INPUTS.top_genes,INPUTS.cut_variable_genes)
+% By default: INPUTS.top_genes = min(300, tot number of genes)
 % 
 % ** INPUTS.cells_2_cut **
 % Users can exclude cells from further analysis. 
 % 1- Remove cells based on their indices in the expression matrix. 
 %    Indices need to be uploaded as a separate csv file. 
-% 0- No cells deletion
+% 0- No cells deletion (by default)
 % 
-% ** INPUTS.perc_top_genes **
-% Users can specify a certain percentage of genes to be used for CALISTA. 
-% For computational efficiency, the number of genes is set to 
-% min(200, INPUTS.perc_top_genes * num of cells/100, num of genes)
-% INPUTS.perc_top_genes = 100
+% ** INPUTS.use_drop_prob_in_clustering **
+% 1- Consider the dropout probability in CALISTA
+% 0- Otherwise
+% By default:
+% If INPUTS.data_type<5 -> INPUTS.use_drop_prob_in_clustering=0;
+% Otherwise INPUTS.use_drop_prob_in_clustering=1;
+%
+% **  INPUTS.cluster_time **
+% 1- Run CALISTA clustering for each time point separately
+% 0- Run CALISTA clustering on the entire dataset (by default)
+%
+% ** INPUTS.plot **
+% 1- Plot additional figures (by default)
+% 0- Otherwise
 %
 % Output:
 % DATA - a structure containing preprocessed expression values for further
 % analysis in CALISTA
 % 
+% INPUTS - a structure containing data description and data preprocessing 
+% settings
+%
 % Created by Nan Papili Gao
 %            Institute for Chemical and Bioengineering 
 %            ETH Zurich
 %            E-mail:  nanp@ethz.ch
 %
-% Copyright. June 1, 2017.
+% Copyright.  October 1, 2018.
 
-fprintf('\n\n**** Please upload normalized data. File formats accepted: .txt , .xlxs , .csv ****\n\n')
+fprintf('\n\n**** Please upload normalized data. File formats accepted: .txt , .xlxs , .csv, .mat ****\n\n')
 
 %% CHECK INPUT ARGUMENTS
 if nargin <1 %Set to default variables
     error('Not enough input arguments')
 end
 
-data_type=INPUTS.data_type;
-format_data=INPUTS.format_data;
-data_selection=INPUTS.data_selection;
-perczeros_genes=INPUTS.perczeros_genes;
-perczeros_cells=INPUTS.perczeros_cells;
-cut_variable_genes=0;
-cells_2_cut=INPUTS.cells_2_cut;
+if ~isfield(INPUTS,'data_type')
+     error('Please specify the data type in INPUTS.data_type')
+end
+
+if ~isfield(INPUTS,'format_data')
+     error('Please specify the format of the data in INPUTS.format_data')
+end
+
+if ~isfield(INPUTS,'cluster_time')
+     INPUTS.cluster_time=0; 
+end
+
+if ~isfield(INPUTS,'cells_2_cut')
+     INPUTS.cells_2_cut=0; 
+end
+
+if ~isfield(INPUTS,'cut_variable_genes')
+     INPUTS.cut_variable_genes=1000;
+end
+
+if ~isfield(INPUTS,'data_selection')
+     INPUTS.data_selection=[];
+end
+
+if INPUTS.cluster_time~=0 && ~isempty(INPUTS.data_selection)
+    fprintf('\nCALISTA Time CLustering is active. INPUTS.data_selection set as []. All time points are considered for the analysis\n')
+    INPUTS.data_selection=[];
+end
+
+if ~isfield(INPUTS,'zeros_genes')
+    if INPUTS.data_type<5
+        INPUTS.zeros_genes=1;
+    else
+        INPUTS.zeros_genes=3;
+    end
+end
+
+if ~isfield(INPUTS,'zeros_cells')
+    if INPUTS.data_type<5
+        INPUTS.zeros_cells=1;
+    else
+        INPUTS.zeros_cells=200;
+    end
+end
+
+if ~isfield(INPUTS,'top_genes')
+     INPUTS.top_genes=300;
+end
+
+if ~isfield(INPUTS,'plot')
+        INPUTS.plot=1; 
+     
+end
+
+if ~isfield(INPUTS,'use_drop_prob_in_clustering')
+    if INPUTS.data_type<5
+        INPUTS.use_drop_prob_in_clustering=0;
+    else
+        INPUTS.use_drop_prob_in_clustering=1;
+    end
+end
+
+if ~isfield(INPUTS,'remove_batch_effects')
+    INPUTS.remove_batch_effects=0;
+end
 
 %% UPLOADING
-if data_type>=1
-    
-    [DATA]=normalization(data_type,format_data,perczeros_genes,perczeros_cells,cut_variable_genes,cells_2_cut);
-else
-    [DATA]=normalization(data_type,format_data,perczeros_genes,perczeros_cells,[],cells_2_cut);
-end
-%% CHECK INPUT ARGUMENTS
 
-if isempty(data_selection)
-    data_selection=(1:size(DATA.singleCELLdata,2)); % Default all the dataset
-end
+[DATA]=new_normalization(INPUTS);
 
-nc=length(data_selection);
+%     cut_variable_genes=1.7;
+%     binning_method=2;
+%     [DATA]=normalization_large_dataset(data_type,format_data,perczeros_genes,perczeros_cells,cut_variable_genes,cells_2_cut,binning_method);
 
-
-%% INITIALIZATION
-timeline=[];
-genes=DATA.genes;
-for i=1:nc
-    mRNA=DATA.singleCELLdata{data_selection(i)}';
-    nt(i)=size(mRNA,1);
-    timeline=[timeline; DATA.timeline(DATA.timeline==DATA.time(data_selection(i)))];
-    if i==1
-        mRNA_all=mRNA;
-    else
-        mRNA_all=[mRNA_all;mRNA];
-    end
-    if length(data_selection)~=DATA.num_time_points
-        DATA.singleCELLdata{i}=mRNA';
-    end
-end
-
-labels=cellstr(num2str((timeline)));
-my_stages=str2num(cell2mat(labels));
-DATA.totDATA=mRNA_all;
-
-DATA.timeline=timeline;
-if length(data_selection)~=DATA.num_time_points
-    DATA.time=DATA.time(data_selection);
-    DATA.num_time_points=length(DATA.time);
-end
-
-DATA.nc=nc;
-DATA.nt=nt;
-DATA.labels=labels;
-DATA.my_stages=my_stages;
-DATA.nvars=size(DATA.totDATA,1);
-
-
-% Select top genes for RNA-seq data
-if data_type>=1
-    perc_top_genes=INPUTS.perc_top_genes;%mean(DATA.zscores_most_variable_genes)+std(DATA.zscores_most_variable_genes);%INPUTS.perc_top_genes;
-    n_top_genes=min([200;round(DATA.nvars*perc_top_genes/100);length(DATA.genes)]);%length(DATA.genes);%min(200,round(DATA.nvars/5)); %round(length(DATA.genes)/2));
-    %find(abs(DATA.zscores_most_variable_genes)>=perc_top_genes,1,'last');%
-    if DATA.numGENES > n_top_genes
-        DATA.genes=DATA.genes(1:n_top_genes);
-        DATA.totDATA=DATA.totDATA(:,1:n_top_genes);
-        DATA.numGENES=length(DATA.genes);
-        for i=1: DATA.num_time_points
-            DATA.singleCELLdata{i}=DATA.singleCELLdata{i}(1:n_top_genes,:);
-        end
-    end
-end 
-
-% *** Parameters loading ***
-load('Parameters.mat')
-DATA.Parameters=Parameters;
-
+fprintf('\nDONE.\n');
 end

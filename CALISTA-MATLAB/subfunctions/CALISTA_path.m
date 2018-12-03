@@ -6,39 +6,72 @@ function [Results]=CALISTA_path(Results,INPUTS)
 %            E-mail:  nanp@ethz.ch
 %
 % Copyright. June 1, 2017.
-
-
-plot_fig=INPUTS.plot_fig;
-hclustering=INPUTS.hclustering;
-CV_plot=INPUTS.CV_plot;
-
-
-
-figure(102)
-if Results.TRANSITION.clusterTEXT
-else
-    for i=1:Results.expected_clusters
-        text(Results.TRANSITION.x_center(i),Results.TRANSITION.y_center(i),Results.TRANSITION.z_center(i),num2str(i),'FontSize',50);
-    end
+if ~isfield(INPUTS,'moving_average_window')
+    INPUTS.moving_average_window=10;
 end
-hh=Results.TRANSITION.final_graph;
-add_paths=true;
-count=1;
-while add_paths
+
+if ~isfield(INPUTS,'CV_plot')
+    INPUTS.CV_plot=0;
+end
+
+if ~isfield(INPUTS,'plot_fig')
+    INPUTS.plot_fig=0;
+end
+
+if ~isfield(INPUTS,'hclustering')
+    INPUTS.hclustering=0;
+end
+
+
+%% Define cell paths
+%%%%%%%%%%%%%%%%%%%%%%
+if INPUTS.path_auto
+      h=Results.TRANSITION.final_graph;
+      h.Edges.Weight=abs(h.Edges.Weight);
+    selected_edges=[];
+    fprintf('\nAutomatically detect paths along the graph based on shortestpath..\n')
+    ending_clusters=find(Results.cluster_progression==max(Results.cluster_progression));
+    for i =1: length(ending_clusters)
+        [shortest_path{i},~,edgepath] = shortestpath(h,1,ending_clusters(i));
+        selected_edges=[selected_edges edgepath];
+    end
+    CELL_path=shortest_path;
+    selected_edges=unique(selected_edges);
+    %     highlight(p,'Edges',selected_edges)
+    refined_nodes(:,1)=h.Edges.EndNodes(selected_edges,1);
+    refined_nodes(:,2)=h.Edges.EndNodes(selected_edges,2);
+    refined_nodes(:,3)=h.Edges.Weight(selected_edges);
+    h_refined=[];
+    h_refined=graph;
+    non=length(unique(refined_nodes(:,1:2)));
+    h_refined=addnode(h_refined,non);
+    %     NumberOfEdges=non-1;
+    %     NumberOfEdges=1;
+    h_refined=addedge(h_refined, refined_nodes(:,1),refined_nodes(:,2),abs(refined_nodes(:,3)));
+    Results.PATH.h_refined=h_refined;
+    Results.PATH.refined_nodes=refined_nodes;
     
-    fprintf('%s %4i','Path num: ',count')
-    fprintf('\n ******************************************************** \n')
-    fprintf('\nKey the clusters in the path based on the progression (e.g. [1 2 3 4]): ')
-    CELL_path{count}=input('');
-    fprintf('\nPress 1 to add another path, 0 otherwise: ');
-    continue_add=input('');
-    if continue_add
-        figure(102)
-        count=count+1;
-    else
-        add_paths=false;
+else
+    
+    add_paths=true;
+    count=1;
+    while add_paths
+        
+        fprintf('%s %4i','Path num: ',count')
+        fprintf('\n ******************************************************** \n')
+        fprintf('\nKey the clusters in the path based on the progression (e.g. [1 2 3 4]): ')
+        CELL_path{count}=input('');
+        fprintf('\nPress 1 to add another path, 0 otherwise: ');
+        continue_add=input('');
+        if continue_add
+            figure(102)
+            count=count+1;
+        else
+            add_paths=false;
+        end
     end
 end
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -63,16 +96,16 @@ for i=1:n_paths
     [idx_sorted_cells,idxSORTED_cells_in_path]=sort(cells_in_path);
     path_mRNA_all{i}=Results.GENES.mRNA_tot_transition_genes(idx_cells_in_path,:);
     path_mRNA_all{i}= path_mRNA_all{i}(idxSORTED_cells_in_path,:);
-    radius_width=round(max(length(cells_in_path)*INPUTS.moving_average_window/100,10));
+    radius_width=min(round(max(length(cells_in_path)*INPUTS.moving_average_window/100,10)),100);
     smoothExpr{i}=movmean(path_mRNA_all{i},radius_width,1,'Endpoints','discard');
-    if CV_plot
+    if INPUTS.CV_plot
         smoothExpr_std{i}=movstd(path_mRNA_all{i},radius_width,1,'Endpoints','discard');
         CV{i}=smoothExpr_std{i}./smoothExpr{i};
         Results.PATH.CV{i}=CV{i};
     end
     windowCenters{i}=1:size(smoothExpr{i},1);
     
-    if plot_fig
+    if INPUTS.plot_fig
         colors=[ 1 0 0; 0 0.6 0 ];
         % Plot one figure with all genes
         hfig=figure(5000);
@@ -137,7 +170,7 @@ for i=1:n_paths
         % %                             xlim([0 2000])
         %             end
         %             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        if CV_plot
+        if INPUTS.CV_plot
             figure(6000)
             for index = 1:length(Results.GENES.tot_transition_genes)
                 subplot(p(1),p(2),index)
@@ -156,7 +189,7 @@ for i=1:n_paths
     end
     
     
-    if hclustering
+    if INPUTS.hclustering
         
         fprintf('\nHierarchical clustering based on cell ordering...\n')
         color_hierarchical=Results.c(idx_cells_in_path,:);

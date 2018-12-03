@@ -1,16 +1,40 @@
-function [final_results] = CALISTA_clustering(mRNA_all,log_p_mat_ma,k_new,expected_clusters ,varargin )
+function [final_results] = CALISTA_clustering(DATA,INPUTS,Results,varargin )
 
 
 % CALISTA is a novel computational method for Clustering And 
 % Lineage Inference through Single Cell Transcriptomics Analysis
 
-if nargin <4
+if nargin <3
     error('Not enough input variables.')
 end
+
+mRNA_all=DATA.totDATA;
+k_new=DATA.Parameters.sets;
+expected_clusters=Results.expected_clusters;
 
 if length(expected_clusters)>1
     error('Please input only one value for the expected number of clusters')
 end
+
+if INPUTS.use_drop_prob_in_clustering
+    p_mat_ma=DATA.Parameters.P;
+    opt_lambda=DATA.opt_lambda;
+    % invert the probability matrix  %NOT LOG AS IN TRANSITION GENES!
+    X=p_mat_ma';
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Define dropout probability
+    epsilon=min(min(X(X>0)));
+    mRNA_counts=[0 1:200];
+    P_temp=exp(-opt_lambda*mRNA_counts)';
+    P=diag([1; 1-P_temp(2:end)]);
+    P(:,1)=P_temp;
+    Z_temp=X*P;
+    Z_temp(Z_temp==0)=epsilon;  %%%%%%% SET ZEROS TO A SMALL VALUE
+    Z_temp=log(Z_temp)';
+else
+    Z_temp=DATA.Parameters.logP;
+end
+
 
 %% Default values
 % run optimiziation
@@ -86,6 +110,11 @@ for k=1:2:nVarargs
         my_cluster=varargin{k+1};
     end
     
+    if strcmp(varargin{k},'use_imputed_data')
+        mRNA_all=varargin{k+1};
+        [nvars, n_genes]=size(mRNA_all);
+        
+    end
 end
 
 % if no optimization just run for 1 population
@@ -97,7 +126,11 @@ if optimize==false
     end
 elseif length(expected_clusters)==1
     % if optimization is true sample random numbers between 1 and expected clusters
-    seed=round(nvars/2*expected_clusters);
+    if INPUTS.data_type==5
+        seed=round(nvars/2000*expected_clusters);
+    else
+        seed=round(nvars/2*expected_clusters);
+    end
     rng(seed) % For reproducibility
     as_all=randi([1 expected_clusters],loops,nvars);
     
@@ -146,40 +179,60 @@ else
     p=aaa.NumWorkers;
     p=p-1;  % number of CPUs used for parallel execution (minus 1 for system stability)
 end
-
 %% RUN Greedy Algorithm
 display=1;
-[my_results ] = greedy_cabsel( as_all,log_p_mat_ma,k_new,mRNA_all,n_genes,max_iter,nvars,...
+[my_results ] = greedy_cabsel( as_all,Z_temp,k_new,mRNA_all,n_genes,max_iter,nvars,...
     optimize,opt_idx_a,p,sum_prob_tot,in_population,loops,expected_clusters,algorithm,display);
 
 my_results.cluster=expected_clusters;
-population=my_results.population;
-% consensus
-consensus=get_consensus(population);
 all_my_results.all=my_results;
 
-
-
-i=0;
-
 if optimize==true
-     
-    switch my_cluster
-        case 'kmedoids'
-            stream = RandStream('mrg32k3a');  % Random number stream
-            options = statset('UseParallel',run_parallel,'UseSubstreams',run_parallel,...
-            'Streams',stream);
-            idx=kmedoids(consensus,expected_clusters,'Algorithm','pam','Replicates',5,'Options',options);
-        case 'hierarchical'
+    
+    switch INPUTS.step
+        case 1
+            population=my_results.population;
+            % consensus
+            fprintf('\nConstructing consensus matrix...\n');
+            consensus=get_consensus(population,p);
+        case 2
             
-            Z = linkage(zscore(consensus),'complete');%'average','correlation'); %'complete);
-            idx=cluster(Z,'maxclust',expected_clusters);
-    end
+            
+            if INPUTS.data_type==5
+                fprintf('\nBest cell assignment...\n');
+                idx=my_results.best';
+            else
+                fprintf('\nPerforming clustering based on consensus matrix...\n');
+                population=my_results.population;
+                % consensus
+                fprintf('\nConstructing consensus matrix...\n');
+                consensus=get_consensus(population,p);
+                data_2_cluster=consensus;
+                
+                switch my_cluster
+                    case 'kmedoids'
+                        fprintf('\nKmedois...\n');
+                        stream = RandStream('mrg32k3a');  % Random number stream
+                        options = statset('UseParallel',run_parallel,'UseSubstreams',run_parallel,...
+                            'Streams',stream);
+                        idx=kmedoids(data_2_cluster,expected_clusters,'Algorithm','pam','Replicates',5,'Options',options);
+                    case 'hierarchical'
+                        fprintf('\nHierarchical clustering...\n');
+                        Z = linkage(data_2_cluster,'complete');%'average','correlation'); %'complete);
+                        idx=cluster(Z,'maxclust',expected_clusters);
+                end
+            end
+   
+    
     display=0;
-    [my_results_1 ] = greedy_cabsel(idx',log_p_mat_ma,k_new,mRNA_all,n_genes,max_iter,nvars,...
+    [my_results_1 ] = greedy_cabsel(idx',Z_temp,k_new,mRNA_all,n_genes,max_iter,nvars,...
         false,opt_idx_a,p,sum_prob_tot,in_population,1,expected_clusters,algorithm,display);
     all_my_results.all.clusterprobabilities=my_results_1.clusterprobabilities;
     all_my_results.all.idx=idx;
+    end
+    if exist('consensus','var')
+    all_my_results.all.consensus=consensus;
+    end
 end
 
 final_results.all=all_my_results;

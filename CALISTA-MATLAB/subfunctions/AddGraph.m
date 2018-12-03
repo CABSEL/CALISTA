@@ -28,7 +28,8 @@ xlabel('Cluster pseudotime')
 ylabel('COMP1')
 zlabel('COMP2')
 grid on
-
+az=-26;
+el=8;
 p=plot(h,'EdgeLabel',h.Edges.Weight);
 view([az,el])
 p.MarkerSize=1;

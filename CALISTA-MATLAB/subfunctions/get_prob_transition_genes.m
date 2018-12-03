@@ -1,7 +1,7 @@
-function [prob_each_gene]=get_prob_transition_genes( selected_clusters,log_p_mat_ma,temp_mRNA_all,n_genes,nvars_temp)  
+function [prob_each_gene,opt_idx_clusters]=get_prob_transition_genes( selected_clusters,Z_temp,temp_mRNA_all,n_genes,nvars_temp)  
 
 % mRNA counts of lookup table   
-    [max_mRNA_counts, ~]=size(log_p_mat_ma); 
+    [max_mRNA_counts, ~]=size(Z_temp); 
     % zero is not included, therefore -1
     max_mRNA_counts=max_mRNA_counts-1;
     % define array
@@ -18,7 +18,7 @@ function [prob_each_gene]=get_prob_transition_genes( selected_clusters,log_p_mat
         % bounds of each clusters
         bounds=[1 lastIDX(1:end-1)'+1; lastIDX']';
         % invert the probability matrix
-        X=log_p_mat_ma';
+        X=Z_temp';
         % define array
         opt_idx_clusters=zeros(num_clusters,n_genes);
         %loop over clusters
@@ -44,30 +44,20 @@ function [prob_each_gene]=get_prob_transition_genes( selected_clusters,log_p_mat
         
          % vector for new index
         idx_max_cell_prob=zeros(1,nvars_temp);
-        % check if user want to optimize
        
-            % vector for the cell probabilities in each cluster
+        
+        % vector for the cell probabilities in each cluster
+        cell_prob=zeros(nvars_temp,num_clusters);
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        opt_param_each_gene=reshape(Z_temp(:,opt_idx_clusters'),max_mRNA_counts+1,n_genes,num_clusters);
             
             
-             % loop over all cells
-            for i=1:nvars_temp
-
-                % loop over cluster
-                for clust=1:num_clusters
-                    % loop over genes
-                    for j=1:n_genes
-                        % calculate the lop prob of gene in cell belonging
-                        % to cluster
-                        opt_param_each_gene=log_p_mat_ma(:,opt_idx_clusters(clust,j));
-                        % sum all genes together
-                        cell_prob(i,clust,j)=opt_param_each_gene(temp_mRNA_all(i,j)+1);
-                    end                                        
-                end
-            end
-            
-            
+                       
             for i=1:n_genes
                 for j=1:num_clusters
-                prob_each_gene(j,i)=sum(squeeze(cell_prob(find(selected_clusters==j),j,i)));
+%                 prob_each_gene(j,i)=sum(squeeze(cell_prob(find(selected_clusters==j),j,i)));
+               prob_each_gene(j,i)= sum(squeeze(opt_param_each_gene(temp_mRNA_all(find(selected_clusters==j),i)+1,i,j)));
                 end
             end

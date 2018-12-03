@@ -11,13 +11,14 @@ DDD= mat2cell(mRNA_all',DATA.numGENES,cutDIMENSION);
 min_num_cells=10;
 [ H] = entropy_calculation( DDD,min_num_cells );
 
-figure 
+figure(111)
 subplot(121)
 boxplot(H')
 xlabel('Cluster')
 ylabel('Entropy')
 title('Boxplot for the entropy')
 set(gca,'xtick',Results.cluster_predicted)
+figure(111)
 subplot(122)
 plot(mean(H'),'c')
 hold on

@@ -9,6 +9,7 @@ if display && loops>1
 end
 
 parfor (jj=1:loops,p)
+    startIteration(jj) = tic;
     % for jj=1:loops
     as=as_all(jj,:);
     % mRNA counts of lookup table
@@ -38,6 +39,7 @@ parfor (jj=1:loops,p)
         X=log_p_mat_ma';
         % define array
         opt_idx_clusters=zeros(num_clusters,n_genes);
+        logP_each_gene_each_clust=zeros(num_clusters,n_genes);
         %loop over clusters
         for clust=1:num_clusters
             %  clust
@@ -56,10 +58,12 @@ parfor (jj=1:loops,p)
             Y=Y/sum(Y(:,1));
             Z=X*Y;
             % get the maximum for each gene
-            [~,idx_max_L]=max(Z);
+            [max_L,idx_max_L]=max(Z);
             opt_idx_clusters(clust,:)=idx_max_L;
+            logP_each_gene_each_clust(clust,:)=max_L;
         end
-        
+%         weights=-logP_each_gene_each_clust';
+%         weights=(weights./repmat(sum(weights,2),1,n_genes))';
         % Check if converged or number of maxiterations
         if my_break==true
             break
@@ -94,10 +98,24 @@ parfor (jj=1:loops,p)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         temp_mRNA_all=mRNA_all+1;
         opt_param_each_gene=reshape(log_p_mat_ma(:,opt_idx_clusters'),max_mRNA_counts+1,n_genes,num_clusters);
+%         opt_param_each_gene_P=reshape(p_mat_ma(:,opt_idx_clusters'),max_mRNA_counts+1,n_genes,num_clusters);
+%         mask=(logP_each_gene_each_clust>-1.5)';
         for j=1:n_genes
+%             cell_prob=cell_prob-(squeeze(opt_param_each_gene(temp_mRNA_all(:,j),j,:)).*repmat(weights(j,:),nvars,1));
+%             masked_cell_prob3D=zeros(nvars,num_clusters);
+%             masked_cell_prob3D=squeeze(opt_param_each_gene(temp_mRNA_all(:,j),j,:));
+%             masked_cell_prob3D(:,find(mask(j,:)==0))=0;
+%              cell_prob=cell_prob+masked_cell_prob3D;
+%             temp=cell2mat(splitapply(@(x1){mean(x1)},cell_prob3D,as'));            
+%             aaa(j)=max(nanstd(temp,[],2)./nanmean(temp,2));
             cell_prob=cell_prob+squeeze(opt_param_each_gene(temp_mRNA_all(:,j),j,:));
+%             
         end
-        
+%         cell_prob=cell_prob./repmat(sum(mask),nvars,1);
+%         figure
+%         bar(aaa)
+%         xlabel('gene')
+%         ylabel('max SD')
         
         switch algorithm
             % just go for the maximum
@@ -109,7 +127,8 @@ parfor (jj=1:loops,p)
                 % go for the maxiumum difference between clusters
             case 'greedy_maxdiff'
                 [sum_prob,idx_max_cell_prob]=max(cell_prob-repmat(sum(cell_prob,2),1,expected_clusters),[],2);
-                sum_prob_tot(jj)=sum_prob_tot(jj)+sum_prob;
+                idx_max_cell_prob=idx_max_cell_prob';
+                sum_prob_tot(jj)=sum(sum_prob);
                 maxrel=1;
                 % maximum difference and flip coin, aneal, etc. code sabec
                           
@@ -156,9 +175,14 @@ parfor (jj=1:loops,p)
             fprintf('\b|\n')
         end
     end
+    endIteration(jj) = toc(startIteration(jj));
 end
 
 if optimize==true
+    if max(population(1,:))~=max(population(2,:))
+        my_results.sum_prob_tot=sum_prob_tot;
+    end
+    
     
     [~,indx_best]=max(sum_prob_tot);
     best_as=population(indx_best,:);
@@ -172,7 +196,8 @@ if optimize==true
         optpar(j,:)={k_new(opt_id(j,:),:)};
     end
     my_results.parameter=optpar;
-    
+    my_results.runtime_eachloop=endIteration;
+    my_results.param_idx=opt_id;
 else
     my_results.population=[];
     %     my_results.best=as;
@@ -182,7 +207,7 @@ else
         optpar(j,:)={k_new(opt_id(j,:),:)};
     end
     my_results.parameter=optpar;
-    
+    my_results.param_idx=opt_id;
     %     my_results.optimal_parameter=optpar;
 end
 
