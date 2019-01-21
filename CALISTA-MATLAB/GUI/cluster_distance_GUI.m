@@ -109,8 +109,8 @@ if INPUTS.transition_new==0
     
     az=-26;
     el=8;
-    [h,i]=AddGraph(cluster_distance,Results.colorMARK_calista,x_center,y_center,z_center,Results.final_groups,Results.expected_clusters,Results.cell_cluster_progression,Results.score3,Results.legendInfo_calista_transition,az,el);
-    
+    [h,i,nodes]=AddGraph(nodes,Results.colorMARK_calista,x_center,y_center,z_center,Results.final_groups,Results.expected_clusters,Results.cell_cluster_progression,Results.score3,Results.legendInfo_calista_transition,az,el,Results.cluster_progression,DATA);
+
     
     MaxNumberOfEdges=size(cluster_distance,1);
     
@@ -256,8 +256,8 @@ else
 %     hfig=figure(100);
     % set(hfig,'Position',[600, 600, 600, 600])
     
-    [h,p]=AddGraph_new(nodes,Results.colorMARK_calista,x_center,y_center,z_center,Results.final_groups,Results.expected_clusters,Results.cell_cluster_progression,Results.score3,Results.legendInfo_calista_transition);
-    title('')
+  [h,i,nodes]=AddGraph(nodes,Results.colorMARK_calista,x_center,y_center,z_center,Results.final_groups,Results.expected_clusters,Results.cell_cluster_progression,Results.score3,Results.legendInfo_calista_transition,az,el,Results.cluster_progression,DATA);
+   title('')
 end
 Results.TRANSITION.x_center=x_center;
 Results.TRANSITION.y_center=y_center;

@@ -13,7 +13,7 @@ end
 hfig=figure(101);
 az=-37.5000;
 el=30;
-[hh,i]=AddGraph(nodes,Results.colorMARK_calista,x_center,y_center,z_center,Results.final_groups,Results.expected_clusters,Results.cell_cluster_progression,Results.score3,Results.legendInfo_calista_transition,az,el,hh);
+[hh,i,nodes]=AddGraph(nodes,Results.colorMARK_calista,x_center,y_center,z_center,Results.final_groups,Results.expected_clusters,Results.cell_cluster_progression,Results.score3,Results.legendInfo_calista_transition,az,el,Results.cluster_progression,DATA);
 title('Lineage Progression')
 
 
