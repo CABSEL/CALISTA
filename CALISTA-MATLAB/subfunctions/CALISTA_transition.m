@@ -82,7 +82,7 @@ hfig=figure(101);
 az=-37.5000;
 el=30;
 
-[h,i]=AddGraph(nodes,Results.colorMARK_calista,x_center,y_center,z_center,Results.final_groups,Results.expected_clusters,Results.cell_cluster_progression,Results.score3,Results.legendInfo_calista_transition,az,el);
+[h,i,nodes]=AddGraph(nodes,Results.colorMARK_calista,x_center,y_center,z_center,Results.final_groups,Results.expected_clusters,Results.cell_cluster_progression,Results.score3,Results.legendInfo_calista_transition,az,el,Results.cluster_progression,DATA);
 
 MaxNumberOfEdges=size(nodes,1);
 
@@ -161,7 +161,7 @@ while stop_adding==false
             close(101);
             stop_adding=true;
             figure(102)
-            [h,i]=AddGraph(nodes,Results.colorMARK_calista,x_center,y_center,z_center,Results.final_groups,Results.expected_clusters,Results.cell_cluster_progression,Results.score3,Results.legendInfo_calista_transition,az,el,h);
+            [h,i]=AddGraph(nodes,Results.colorMARK_calista,x_center,y_center,z_center,Results.final_groups,Results.expected_clusters,Results.cell_cluster_progression,Results.score3,Results.legendInfo_calista_transition,az,el,Results.cluster_progression,DATA,h);
             title('Lineage Progression')
         end
         %43 -> +
@@ -457,6 +457,32 @@ Results.stages_name=stages_name;
 %% Pie charts
 
 if ~(length(unique(DATA.timeline))==1 && unique(DATA.timeline)==0) || isfield(Results,'cell_labels')
+%     figure
+%     p=numSubplots(length(DATA.time));
+%     for i=1:length(DATA.time)
+%         idx_cells_in_t=find( DATA.timeline==DATA.time(i));
+%         
+%         labels_in_t=Results.final_groups(idx_cells_in_t);
+%         [aa,cc]=hist(labels_in_t,1:Results.expected_clusters);
+%         occurrence = aa/length(labels_in_t);
+%         cc(find(aa==0))=[];
+%         occurrence(find(aa==0))=[];
+%         %     cut=find(occurrence<=0);
+%         %     occurrence(cut)=[];
+%         %     aa(cut)=[];
+%         
+%         ax=subplot(p(1),p(2),i);
+%         [~,ee]=ismember(cc,Results.cluster_predicted);
+%         pp=pie(ax,occurrence,cellstr(strcat('K ',num2str(cc'))));
+%         hp = findobj(pp, 'Type', 'patch');
+%         for j=1:length(occurrence)
+%             
+%             set(hp(j), 'FaceColor', Results.colorMARK_calista(ee(j),:));
+%         end
+%         
+%         title(ax,sprintf( '%s %4i', 'Time', DATA.time(i)))
+%         
+%     end
     p=numSubplots(Results.expected_clusters);
     figure
     for i=1:Results.expected_clusters
@@ -486,13 +512,13 @@ if ~(length(unique(DATA.timeline))==1 && unique(DATA.timeline)==0) || isfield(Re
             [aa,~,cc]=unique(labels_in_k);
             occurrence = (hist(cc,length(aa)))*100/length(labels_in_k);
             
-            cut=find(occurrence<=5);
+            cut=find(occurrence<=0);
             occurrence(cut)=[];
             aa(cut)=[];
             
             ax=subplot(p(1),p(2),i);
             [~,ee]=ismember(aa,DATA.time);
-            pp=pie(ax,occurrence,cellstr(strcat('t',num2str(aa))));
+            pp=pie(ax,occurrence,cellstr(strcat('t ',num2str(aa))));
             hp = findobj(pp, 'Type', 'patch');
             for j=1:length(occurrence)
                 
@@ -500,7 +526,7 @@ if ~(length(unique(DATA.timeline))==1 && unique(DATA.timeline)==0) || isfield(Re
             end
             
             title(ax,sprintf( '%s %4i', 'Cluster', Results.cluster_predicted(i)))
-            Results.pp=pp;
+            
         end
     end
 end

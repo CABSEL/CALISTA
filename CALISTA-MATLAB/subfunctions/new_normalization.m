@@ -16,11 +16,12 @@ cut_variable_genes=INPUTS.cut_variable_genes;
 
 [FileName,PathName,FilterIndex] = uigetfile('*.*');
 filename=strcat(PathName, FileName);
-imported_data=importdata(filename);
+
 
 DATA.FileName=filename;
 switch format_data
     case 1
+        imported_data=importdata(filename);
         NUM=imported_data.data;
         NUM(isnan(NUM(:,1)),:)=[]; % REMOVE ROW WITH AT LEAST ONE NaN
         totDATA=NUM(:,1:end-1);
@@ -30,6 +31,7 @@ switch format_data
         DATA.genes=TXT(1,1:end-1);
         cell_ID=cellstr(num2str([1:size(totDATA,1)]'));
     case 2
+        imported_data=importdata(filename);
         NUM=[imported_data.data(2:end,:)' imported_data.data(1,:)'];
         NUM(isnan(NUM(:,1)),:)=[]; % REMOVE ROW WITH AT LEAST ONE NaN
         totDATA=NUM(:,1:end-1);
@@ -38,6 +40,7 @@ switch format_data
         DATA.genes=TXT(1,2:end);
         cell_ID=cellstr(num2str([1:size(totDATA,1)]'));
     case 3
+        imported_data=importdata(filename);
         NUM=imported_data.data;
         NUM(isnan(NUM(:,1)),:)=[]; % REMOVE ROW WITH AT LEAST ONE NaN
         totDATA=NUM;
@@ -50,6 +53,7 @@ switch format_data
         end
         cell_ID=cellstr(num2str([1:size(totDATA,1)]'));
     case 4
+        imported_data=importdata(filename);
         NUM=imported_data.data';
         NUM(isnan(NUM(:,1)),:)=[]; % REMOVE ROW WITH AT LEAST ONE NaN
         totDATA=NUM;
@@ -62,6 +66,7 @@ switch format_data
         end
         cell_ID=cellstr(num2str([1:size(totDATA,1)]'));
     case 5
+        imported_data=importdata(filename);
         fprintf(' Text data extracted preview: \n\n')
         disp(imported_data.textdata(1:5,1:7))
         [row,col]=size(imported_data.textdata)
@@ -102,9 +107,10 @@ switch format_data
             timeline=zeros(size(totDATA,1),1);
         end
         %         [totDATA,timeline,outlier_idx,outliers]=remove_outliers(totDATA,timeline);
-        cell_ID=cellstr(num2str([1:size(totDATA,1)]'));
-        
+         cell_ID=cellstr(num2str([1:size(totDATA,1)]'));
+    
     case 6
+        imported_data=importdata(filename);
         if isstruct(imported_data)
             totDATA=imported_data.expMatrix;
         else
@@ -121,12 +127,7 @@ switch format_data
             timeline=zeros(size(totDATA,1),1);
         end
         if isfield(imported_data,'geneNAMES')
-            if ~iscell(imported_data.geneNAMES)
-                DATA.genes=cellstr(imported_data.geneNAMES);
-            else
-                DATA.genes=imported_data.geneNAMES;
-            end
-            
+            DATA.genes=imported_data.geneNAMES;
         else
             DATA.genes=cellstr(num2str([1:size(totDATA,2)]'));
         end
@@ -140,19 +141,17 @@ switch format_data
                 cell_ID=imported_data.cellID;
             end
         else
-            cell_ID=cellstr(num2str([1:size(totDATA,1)]'));
+             cell_ID=cellstr(num2str([1:size(totDATA,1)]'));
         end
     case 7
+        imported_data=importdata(filename);
         if isstruct(imported_data)
             totDATA=imported_data.expMatrix;
         else
             totDATA=imported_data;
         end
         
-        [triplets(:,1),triplets(:,2),triplets(:,3)]=find(totDATA);
-        triplets(:,3)=2.^(triplets(:,3))-1;
-        %         totDATA=2.^(totDATA)-1;  % transform back first!!
-        totDATA=sparse(triplets(:,1),triplets(:,2),triplets(:,3));
+        totDATA=2.^(totDATA)-1;  % transform back first!!
         
         if isfield(imported_data,'timeline')
             if size(imported_data.timeline,2)==1
@@ -164,11 +163,7 @@ switch format_data
             timeline=zeros(size(totDATA,1),1);
         end
         if isfield(imported_data,'geneNAMES')
-            if ~iscell(imported_data.geneNAMES)
-                DATA.genes=cellstr(imported_data.geneNAMES);
-            else
-                DATA.genes=imported_data.geneNAMES;
-            end
+            DATA.genes=imported_data.geneNAMES;
         else
             DATA.genes=num2cell(1:size(totDATA,2))';
         end
@@ -184,7 +179,55 @@ switch format_data
         else
             cell_ID=cellstr(num2str([1:size(totDATA,1)]'));
         end
+    case 8
+        info = h5info(filename);
+        totDATA = h5read(filename,'/matrix');
+        totDATA=sparse(double(totDATA));
+        DATA.genes={};
+        timeline=[];
+        cell_ID={};
         
+        for ii=1:size(info.Groups,1)
+            match_col_attrs=ismember(info.Groups(ii).Name,'/col_attrs');
+            match_row_attrs=ismember(info.Groups(ii).Name,'/row_attrs');
+            if sum(match_col_attrs)==length(match_col_attrs)
+                for iii=1:size(info.Groups(ii).Datasets,1)
+                     match_cellID=ismember(info.Groups(ii).Datasets(iii).Name,'CellID');
+                      if sum(match_cellID)==length(match_cellID)
+                          cell_ID=h5read(filename,'/col_attrs/CellID');
+                      end
+                      
+                       match_time_info=ismember(info.Groups(ii).Datasets(iii).Name,'Timepoint');
+                      if sum(match_time_info)==length(match_time_info)
+                          timeline=h5read(filename,'/col_attrs/Timepoint');
+                      end
+                end
+            end
+            if sum(match_row_attrs)==length(match_row_attrs)
+                for iii=1:size(info.Groups(ii).Datasets,1)
+                     match_gene=ismember(info.Groups(ii).Datasets(iii).Name,'Gene');
+                      if sum(match_gene)==length(match_gene)
+                          DATA.genes = h5read(filename,'/row_attrs/Gene');
+                      end
+                end
+            end
+        end
+        
+        imported_data.info=info;
+        
+        
+        if isempty(timeline)
+            timeline=zeros(size(totDATA,1),1);
+        end
+        if isempty(DATA.genes)
+            DATA.genes=cellstr(num2str([1:size(totDATA,2)]'));
+        end
+        
+        DATA.imported_genes=DATA.genes;
+        % Check if cellID is a cell array otherwise convert into it
+        if isempty(cell_ID)
+             cell_ID=cellstr(num2str([1:size(totDATA,1)]'));
+        end
 end
 
 

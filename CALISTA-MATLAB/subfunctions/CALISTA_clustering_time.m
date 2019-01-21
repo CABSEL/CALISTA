@@ -69,7 +69,7 @@ for t=num_time_points:-1:1
     tic
     % *** 2.b-Cell clustering ***
     [ my_results_c] = CALISTA_clustering(DATA,INPUTS,Results,'parallel',parallel,'cluster',Cluster,'algorithm',algorithm,'max_iterations',max_iter,'pop_size',loops);    
-    runtime(t,:)=my_results.all.all.runtime_eachloop;
+    runtime(t,:)=my_results_c.all.all.runtime_eachloop;
     final_groups{t}=my_results_c.all.all.idx';
     toc
     fprintf('\n******************************************************\n');

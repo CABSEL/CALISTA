@@ -124,8 +124,21 @@ Results.colorMARK_calista=colorMARK_calista;
 Results.colorMARK_time=colorMARK_time;
 Results.score3=score3;
 Results.c=c;
-
-
+% Plot time snapshots
+% if ~(length(unique(DATA.timeline))==1 && unique(DATA.timeline)==0) 
+% figure
+% for i=1:length(cluster_predicted)
+%     temp=dot_size(ClusterGroup_calista==cluster_predicted(i));
+%     scatter3(DATA.timeline(ClusterGroup_calista==cluster_predicted(i),1), score3(ClusterGroup_calista==cluster_predicted(i),1), score3(ClusterGroup_calista==cluster_predicted(i),3),temp, repmat(colorMARK_calista(i,:),size(temp,1),1), 'fill');
+%     title('Cell Clustering')
+%     xlabel('timeline')
+%     ylabel('PC1')
+%     zlabel('PC3')
+%     grid on
+%     hold on
+% %     legendInfo_calista{i} = sprintf( '%s %4i', 'Cluster ', i);
+% end
+% end
 % %% Plot with true labels
 % true_labels=input('\nKey 1 for true labels visualization, 0 otherwise :');
 % 

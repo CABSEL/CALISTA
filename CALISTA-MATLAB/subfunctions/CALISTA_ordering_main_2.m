@@ -181,7 +181,8 @@ for clust=1:Results.expected_clusters
      
     
 end
-
+% cell_ordering=in_silico_pseudo;
+% cell_ordering=monocle_pseudo;
 normed_cell_ordering=(cell_ordering(:,1)-min(cell_ordering(:,1))/max(cell_ordering(:,1)-min(cell_ordering(:,1))));
 
 x_center=zeros(Results.expected_clusters,1);
@@ -285,6 +286,7 @@ Results.ORDERING.cell_ordering=cell_ordering;
 Results.ORDERING.normed_cell_ordering=normed_cell_ordering;
 Results.ORDERING.edges_of_cell=edges_of_cell;
 Results.ORDERING.placement=placement;
+Results.ORDERING.x_center=x_center;
 for i=1:n_edges
     % Define cells in edge
     idx_actual_edge{i}=find(Results.ORDERING.cell_ordering(:,2)==i);

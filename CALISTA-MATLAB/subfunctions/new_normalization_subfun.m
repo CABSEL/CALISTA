@@ -90,8 +90,10 @@ if data_type==5 || data_type==6
     % totDATA=log(totDATA+1);
     tot_mRNA_each_cell=sum(totDATA,2);
     new_tot_mRNA_each_cell=median(tot_mRNA_each_cell);
-    scaling=repmat(new_tot_mRNA_each_cell./tot_mRNA_each_cell,1,size(totDATA,2));
-    scaled_totDATA=totDATA.*scaling;
+    %     scaling=repmat(new_tot_mRNA_each_cell./tot_mRNA_each_cell,1,size(totDATA,2));
+    %     scaled_totDATA=totDATA.*scaling;
+    scaling=new_tot_mRNA_each_cell./tot_mRNA_each_cell;
+    scaled_totDATA=bsxfun(@times,scaling,totDATA);
     totDATA=scaled_totDATA;
 end
 

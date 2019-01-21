@@ -98,8 +98,8 @@ else
     % *** 3.b-Plot mean expressions for each cluster ***
     Results=plot_cluster_mean_exp(DATA,Results);
     
-    % *** 3.c-Cell-Cell variability analysis ***
-    [Results]=cell_variability(DATA,Results);
+%     % *** 3.c-Cell-Cell variability analysis ***
+%     [Results]=cell_variability(DATA,Results);
 end
 
 fprintf('\nDONE.\n')

@@ -17,11 +17,11 @@ set(ax, 'Ticklength', [0 0])
 
    
    x = linspace(min(xvec)-dx/2,max(xvec)+dx/2,nx);
-   x = [repmat(x',1,ny)'; nan(1,nx)];
-   xx=x(1:ny,:)';
-   xx=[xx ; nan(1,ny)];
+   x = [repmat(x',1,nx)'; nan(1,nx)];
+   xx=x(1:nx,:)';
+   xx=[xx ; nan(1,nx)];
    y=[linspace(min(yvec)-dy/2,max(yvec)+dy/2,ny) nan]';
-   y = repmat(y,1,nx);
+   y = repmat(y,1,ny);
    yy=y(1:ny,:)';
    yy=[yy; nan(1,ny)];
 

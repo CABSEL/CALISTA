@@ -148,7 +148,7 @@ function [DATA,INPUTS]=import_data(INPUTS)
 %
 % Copyright.  October 1, 2018.
 
-fprintf('\n\n**** Please upload normalized data. File formats accepted: .txt , .xlxs , .csv, .mat ****\n\n')
+fprintf('\n\n**** Please upload normalized data. File formats accepted: .txt , .xlxs , .csv, .mat, .loom ****\n\n')
 
 %% CHECK INPUT ARGUMENTS
 if nargin <1 %Set to default variables
