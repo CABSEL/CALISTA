@@ -82,26 +82,26 @@ ylabel('Num of cells')
 % % %     end
 % % % end
 
-%% ARI population and final_groups
-
-population=Results.clustering_struct.all.all.population;
-count=1;
-for i=1: size(population,1)
-    [AR(i)]=RandIndex(population(i,:),Results.final_groups);
-    [AR2(i)]=RandIndex(population(i,:),Results.cell_labels);
-    labels{count}='Pairwise';
-    count=count+1;
-end
-for i=1: size(population,1)
-    
-    [AR2(i)]=RandIndex(population(i,:),Results.cell_labels);
-     labels{count}='Reference';
-     count=count+1;
-end
-
-to_remove=find(AR==1,1,'first');
-AR(to_remove)=[];
-labels(to_remove)=[];
-figure
-boxplot([AR'; AR2'],labels)
-ylabel('ARI')
+% % % %% ARI population and final_groups
+% % % 
+% % % population=Results.clustering_struct.all.all.population;
+% % % count=1;
+% % % for i=1: size(population,1)
+% % %     [AR(i)]=RandIndex(population(i,:),Results.final_groups);
+% % %     [AR2(i)]=RandIndex(population(i,:),Results.cell_labels);
+% % %     labels{count}='Pairwise';
+% % %     count=count+1;
+% % % end
+% % % for i=1: size(population,1)
+% % %     
+% % %     [AR2(i)]=RandIndex(population(i,:),Results.cell_labels);
+% % %      labels{count}='Reference';
+% % %      count=count+1;
+% % % end
+% % % 
+% % % to_remove=find(AR==1,1,'first');
+% % % AR(to_remove)=[];
+% % % labels(to_remove)=[];
+% % % figure
+% % % boxplot([AR'; AR2'],labels)
+% % % ylabel('ARI')

@@ -33,6 +33,7 @@ INPUTS.method=2; % Use pairwise correlation for the gene co-expression network (
 INPUTS.path_auto=0; % Manually define paths for further analysis
 
 %% Analysis with CALISTA:
+% -UPLOAD AND PRE_PROCESS DATA
 % -SINGLE-CELL CLUSTERING
 % -RECONSTRUCTION OF LINEAGE PROGRESSION
 % -DETERMINATION OF TRANSITION GENES

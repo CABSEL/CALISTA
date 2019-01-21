@@ -72,21 +72,3 @@ end
 
 [Results]=CALISTA_ordering_main_2(DATA,INPUTS,Results);
  
-%% *** 6-LANDSCAPE PLOTTING ***
-%
-% Type 'help CALISTA_landscape_plotting_main' for more information.
-
-CALISTA_landscape_plotting_main(INPUTS,Results);
-
-
-%% *** 7-PATH ANALYSIS ***
-%
-% Type 'help CALISTA_path_main' for more information. 
-
-Proceed2=input(' Press 1 if you want to select transition paths and perform additional analysis, 0 otherwise: ');
-
-if ~Proceed2
-    return
-end
-
-Results=CALISTA_path_main(DATA,INPUTS,Results);

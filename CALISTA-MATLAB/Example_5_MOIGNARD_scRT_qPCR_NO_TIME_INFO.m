@@ -66,33 +66,3 @@ end
 % % daspect([2,2,0.3]);
 % OptionZ.FrameRate=20;OptionZ.Duration=20.5;OptionZ.Periodic=true;
 % CaptureFigVid([-20,10;-110,10;-190,80;-290,10;-380,10], 'CALISTA_lineage_3Dvideo',OptionZ)
-%% *** 4-DETERMINATION OF TRANSITION GENES ***
-%
-% Type 'help CALISTA_transition_genes_main' for more information. 
-
-[Results]=CALISTA_transition_genes_main(DATA,INPUTS,Results);
-
-
-%% *** 5-PSEUDOTEMPORAL ORDERING OF CELLS ***
-%
-% Type 'help CALISTA_ordering_main' for more information. 
-
-[Results]=CALISTA_ordering_main_2(DATA,INPUTS,Results);
-%% *** 6-LANDSCAPE PLOTTING ***
-%
-% Type 'help CALISTA_landscape_plotting_main' for more information.
-
-CALISTA_landscape_plotting_main(INPUTS,Results);
-%% *** 7-PATH ANALYSIS ***
-%
-% Type 'help CALISTA_path_main' for more information. 
-
-Proceed2=input(' Press 1 if you want to select transition paths and perform additional analysis, 0 otherwise: ');
-
-if ~Proceed2
-    return
-end
-
-Results=CALISTA_path_main(DATA,INPUTS,Results);
-
-

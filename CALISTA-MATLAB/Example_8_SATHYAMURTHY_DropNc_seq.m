@@ -29,7 +29,7 @@ INPUTS.zeros_cells=200; % Remove cells with zero values>200
 INPUTS.top_genes=300; % Retain only top 300 most variable genes
 %
 % Specify single-cell clustering settings
-INPUTS.optimize=1; % The number of cluster is known a priori
+INPUTS.optimize=1; % Find the optimal number of clusters
 INPUTS.max_clusters=20; % Max num of clusters
 % 
 

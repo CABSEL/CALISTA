@@ -17,7 +17,6 @@ warning ('off','all');
 % Type 'help import_data' for more information 
 %
 % Specify data types and settings for pre-processing
-% Specify data types and settings for pre-processing
 INPUTS.data_type=5; % snRNA-seq data
 INPUTS.format_data=7; % (RECOMMENDED FOR Droplet-based datasets) File .mat containing the following variables:
 %                       'expMatrix': NxG Log-expression matrix with rows=cells and columns=genes;
@@ -104,7 +103,7 @@ end
 %
 % Type 'help CALISTA_landscape_plotting_main' for more information.
 
-CALISTA_landscape_plotting_main(INPUTS,Results);
+% CALISTA_landscape_plotting_main(INPUTS,Results);
 
 %% *** 7-PATH ANALYSIS ***
 %
