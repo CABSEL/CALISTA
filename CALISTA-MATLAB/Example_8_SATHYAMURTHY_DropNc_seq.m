@@ -31,6 +31,9 @@ INPUTS.top_genes=300; % Retain only top 300 most variable genes
 % Specify single-cell clustering settings
 INPUTS.optimize=1; % Find the optimal number of clusters
 INPUTS.max_clusters=20; % Max num of clusters
+INPUTS.plot_tsne=1; % Plot tsne
+INPUTS.tsne_opts.perplexity = 15; % tsne perplexity
+INPUTS.tsne_opts.input_data = 5; % use top 5 PCs as input data
 % 
 
 % Upload and pre-process data 

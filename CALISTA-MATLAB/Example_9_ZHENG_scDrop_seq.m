@@ -32,7 +32,7 @@ INPUTS.top_genes=200; % Retain only top 200 most variable genes
 % Specify single-cell clustering settings
 INPUTS.use_drop_prob_in_clustering=1;
 INPUTS.optimize=0; % The number of cluster is known a priori
-
+% INPUTS.plot_tsne=0;
 % Upload and pre-process data 
 [DATA,INPUTS] = import_data(INPUTS);
 
