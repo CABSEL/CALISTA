@@ -43,9 +43,10 @@ end
 if ~isfield(INPUTS,'gridshift')
 INPUTS.gridshift=3;
 end
-nVarargs=length(varargin);
+
 st1=1;
 st2=2;
+nVarargs=length(varargin);
 for k=1:2:nVarargs
      if strcmp(varargin{k},'comp')
          st=varargin{k+1};

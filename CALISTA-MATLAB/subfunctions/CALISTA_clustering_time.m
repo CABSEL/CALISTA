@@ -302,8 +302,8 @@ method=3;
 [ my_results_final] = CALISTA_clustering(DATA,INPUTS,Results,'parallel',parallel,'get_k',Results.final_groups,'algorithm',algorithm);
 
 % *** 2.e-Cluster visualization ***
-reduction=2;
-[Results]=visualization(reduction,DATA,Results);
+% reduction=2;
+[Results]=visualization(INPUTS,DATA,Results);
 if isfield(my_results_c.all.all,'consensus')
     my_results_final.all.all.consensus=my_results_c.all.all.consensus;
 end

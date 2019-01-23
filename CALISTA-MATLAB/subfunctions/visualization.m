@@ -1,4 +1,4 @@
-function [Results]=visualization(reduction,DATA,Results)
+function [Results]=visualization(INPUTS,DATA,Results)
 
 fprintf('\nPlotting...\n')
 expected_clusters=Results.expected_clusters;
@@ -11,37 +11,36 @@ zeros_cells=sum(totDATA==0,2)*100/size(totDATA,2);
 dot_size=30*ones(size(totDATA,1),1);%10+round(zeros_cells/2);%30*ones(size(totDATA,2),1);%round(zeros_cells/2);%30*ones(size(totDATA,2),1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-switch reduction
-    case 1
-        % ********** t-SNE **********
-        %set parameters
-        initial_dims=DATA.numGENES;
-        perplexity=30; %usually between 5-50
-        no_dims=3;
-        % all the data
-        dataANALYSING=totDATA;
-        score3= tsne2(dataANALYSING, [], no_dims, initial_dims, perplexity);
         
-    case 2
-        % ********** PCA **********
-        [coeff, score3,latent] = pca(zscore(totDATA));
-        Results.coeff=coeff;
-        explainedVar=latent*100/sum(latent);
-        
-        figure;
-        bar(explainedVar)
-        title('Explained Variance in %')
-        grid on
-        xlabel('PC')
-        ylabel('Variance in %')
 
-    case 3
-        % ********** DIFFUSION MAP **********
-        %without zscore
-        no_dims = 4;
-        t       = 10;
-        S   = 50;
-        [score3] = diffusion_maps(zscore(totDATA), no_dims, t, S); %or UPandDOWNdata
+    
+% ********** PCA **********
+[coeff, score3,latent] = pca(zscore(totDATA));
+Results.coeff=coeff;
+explainedVar=latent*100/sum(latent);
+
+figure;
+bar(explainedVar)
+title('Explained Variance in %')
+grid on
+xlabel('PC')
+ylabel('Variance in %')
+
+if INPUTS.plot_tsne==1
+    % ********** t-SNE **********
+    %set parameters
+    %         initial_dims=DATA.numGENES;
+    disp('******************************************************************************')
+    disp('*** ATTENTION: for tsne plot please visit https://github.com/KlugerLab/FIt-SNE')
+    disp('and install FFTW from http://www.fftw.org ***')
+    disp('******************************************************************************')
+    opts.perplexity=INPUTS.tsne_opts.perplexity;
+    if INPUTS.tsne_opts.input_data == 0
+        score2=fast_tsne(totDATA,opts);
+    else
+        score2=fast_tsne(score3(:,1:min(size(score3,2),INPUTS.tsne_opts.input_data)),opts);
+    end
+    Results.score2=score2;
 end
 
 % *** Colormap for the original cell info ***
@@ -120,11 +119,54 @@ end
 legend(Results.legendInfo_calista,'Location', 'northeast')
 pause(3)
 
+if INPUTS.plot_tsne==1
+    
+    hfig=figure(1001);
+    if ishandle(hfig)
+        clf(1001)
+    end
+    % set(hfig,'position', [500, 500, 1200, 400])
+    subplot(121)
+    for i=1:DATA.num_time_points
+        scatter(score2(DATA.timeline==DATA.time(i),1), score2(DATA.timeline==DATA.time(i),2),dot_size(DATA.timeline==DATA.time(i)),colorMARK_time(i,:),'fill')
+        xlabel('PC1')
+        ylabel('PC2')
+        zlabel('PC3')
+        title('Original time/cell stage info')
+        grid on
+        hold on
+        
+        legendInfo_time{i} = sprintf( '%s %4i', 'Time/Stage', DATA.time(i));
+    end
+    legend(legendInfo_time,'Location', 'northeast')
+    
+    Results.h2=subplot(122);
+    for i=1:length(cluster_predicted)
+        temp=dot_size(ClusterGroup_calista==cluster_predicted(i));
+        scatter(score2(ClusterGroup_calista==cluster_predicted(i),1), score2(ClusterGroup_calista==cluster_predicted(i),2), temp, repmat(colorMARK_calista(i,:),size(temp,1),1), 'fill');
+        title('Cell Clustering')
+        xlabel('TSNE1')
+        ylabel('TSNE2')
+        grid on
+        hold on
+        %     legendInfo_calista{i} = sprintf( '%s %4i', 'Cluster ', i);
+    end
+    
+    legend(Results.legendInfo_calista,'Location', 'northeast')
+    pause(3)
+    
+end
+
+
+
+
+
 Results.colorMARK_calista=colorMARK_calista;
 Results.colorMARK_time=colorMARK_time;
 Results.score3=score3;
 Results.c=c;
-% Plot time snapshots
+
+%% Plot time snapshots
 % if ~(length(unique(DATA.timeline))==1 && unique(DATA.timeline)==0) 
 % figure
 % for i=1:length(cluster_predicted)
@@ -181,6 +223,18 @@ Results.c=c;
 %         
 %         
 %     end
+%     figure
+%     for i=1:length(unique_cell_labels)
+%         scatter(score2(IC==i,1), score2(IC==i,2),dot_size(IC==i),colorMARK_labels(i,:),'fill')
+%         xlabel('TSNE1')
+%         ylabel('TSNE2')
+%         
+%         title('True labels')
+%         grid on
+%         hold on
+%         
+%         
+%     end
 %     
 %     if iscell(unique_cell_labels)
 %         legend(cellstr(unique_cell_labels),'Location', 'northeast')
@@ -192,5 +246,5 @@ Results.c=c;
 %     Results.colorMARK_labels=colorMARK_labels;
 %     Results.unique_cell_labels=unique_cell_labels;
 % end
-
-
+% 
+% 

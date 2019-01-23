@@ -76,7 +76,7 @@ if isempty(Results)
         Results=plot_cluster_mean_exp(DATA,Results);
         
         % *** 3.c-Cell-Cell variability analysis ***
-        [Results]=cell_variability(DATA,Results);
+%         [Results]=cell_variability(DATA,Results);
     end
     
     
@@ -183,8 +183,7 @@ for clust=1:Results.expected_clusters
 end
 % cell_ordering=in_silico_pseudo;
 % cell_ordering=monocle_pseudo;
-normed_cell_ordering=(cell_ordering(:,1)-min(cell_ordering(:,1))/max(cell_ordering(:,1)-min(cell_ordering(:,1))));
-
+normed_cell_ordering=(cell_ordering(:,1)-min(cell_ordering(:,1)))/(max(cell_ordering(:,1))-min(cell_ordering(:,1)));
 x_center=zeros(Results.expected_clusters,1);
 y_center=Results.TRANSITION.y_center;
 z_center=Results.TRANSITION.z_center;

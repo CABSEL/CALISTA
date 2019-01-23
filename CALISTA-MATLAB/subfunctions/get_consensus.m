@@ -16,7 +16,7 @@ consensus=sparse(nvars,nvars);
 % end
 % consensus=consensus+runs*eye(nvars);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-parfor (cycle=1:runs,p)
+parfor (cycle=1:runs,2)
 %     cycle
     for clust=1:expected_clusters
         cell_idx_in_cluster=find(population(cycle,:)==clust);

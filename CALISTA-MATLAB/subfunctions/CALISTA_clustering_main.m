@@ -44,6 +44,19 @@ function [Results, DATA, INPUTS]=CALISTA_clustering_main(DATA,INPUTS)
 % 'hierarchical'- hierachical clustering of consensus matrix
 % 'kmedoids'-  kmedoids for the clustering of consensus matrix (by default)
 %
+% ** INPUTS.plot_tsne **
+% 1- for t-sne plot after clustering (default) 
+% 0- otherwise 
+% For more info visit https://github.com/KlugerLab/FIt-SNE and http://www.fftw.org
+%
+% ** INPUTS.tsne_opts.perplexity **
+% Perplexity parameter for tnse (usually a value between 1 and 30 (default))
+% 
+% ** INPUTS.tsne_opts.input_data 
+% 0- Use the expression data as input
+% otherwise a values between 1 and number of genes to use top 'INPUTS.tsne_opts.input_data'
+% principal components as input
+%     
 % DATA - a structure containing preprocessed single-cell expression data
 % Use 'import_data' to upload and preprocess single-cell expression values
 %
@@ -112,6 +125,24 @@ if ~isfield(INPUTS,'use_drop_prob_in_clustering')
         INPUTS.use_drop_prob_in_clustering=0;
     else
         INPUTS.use_drop_prob_in_clustering=1;
+    end
+end
+
+if ~isfield(INPUTS,'plot_tsne')
+    INPUTS.plot_tsne=0;
+end
+
+if  INPUTS.plot_tsne==1
+    if ~isfield(INPUTS,'opts')
+    INPUTS.tsne_opts.perplexity = 30;
+    INPUTS.tsne_opts.input_data = 0;
+    else
+        if ~isfield(INPUTS.tsne_opts,'perplexity')
+           INPUTS.tsne_opts.perplexity=30;
+        end
+         if ~isfield(INPUTS.tsne_opts,'input_data')
+           INPUTS.tsne_opts.input_data=0;
+         end
     end
 end
 
