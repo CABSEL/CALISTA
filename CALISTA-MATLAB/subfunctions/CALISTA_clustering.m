@@ -132,8 +132,17 @@ elseif length(expected_clusters)==1
         seed=round(nvars/2*expected_clusters);
     end
     rng(seed) % For reproducibility
+    cutoff=ceil(round(nvars/expected_clusters));
+    if cutoff<=30
+        as_temp=repmat(1:expected_clusters,loops,cutoff+1);
+        as_temp=as_temp(:,1:nvars);
+        for r_loops=1:loops
+            as_temp(r_loops,:)=as_temp(r_loops,randperm(nvars));
+        end
+        as_all=as_temp;
+    else
     as_all=randi([1 expected_clusters],loops,nvars);
-    
+    end
 end
 
 % if user provides initial poplation and at the same time wants to
@@ -222,16 +231,16 @@ if optimize==true
                         idx=cluster(Z,'maxclust',expected_clusters);
                 end
             end
-   
-    
-    display=0;
-    [my_results_1 ] = greedy_cabsel(idx',Z_temp,k_new,mRNA_all,n_genes,max_iter,nvars,...
-        false,opt_idx_a,p,sum_prob_tot,in_population,1,expected_clusters,algorithm,display);
-    all_my_results.all.clusterprobabilities=my_results_1.clusterprobabilities;
-    all_my_results.all.idx=idx;
+            
+            
+            display=0;
+            [my_results_1 ] = greedy_cabsel(idx',Z_temp,k_new,mRNA_all,n_genes,max_iter,nvars,...
+                false,opt_idx_a,p,sum_prob_tot,in_population,1,expected_clusters,algorithm,display);
+            all_my_results.all.clusterprobabilities=my_results_1.clusterprobabilities;
+            all_my_results.all.idx=idx;
     end
     if exist('consensus','var')
-    all_my_results.all.consensus=consensus;
+        all_my_results.all.consensus=consensus;
     end
 end
 
