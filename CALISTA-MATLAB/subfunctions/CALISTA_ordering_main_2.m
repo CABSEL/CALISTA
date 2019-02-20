@@ -233,6 +233,10 @@ Xcoordinate=A(k);
 xnew=interp1([1 100],[p.ZData(edges_of_cell(:,1)); p.ZData(edges_of_cell(:,2))],1:100);
 A=xnew';
 Zcoordinate=A(k);
+toll=0.04;
+Xcoordinate=Xcoordinate+(toll)*rand(DATA.nvars,1);
+Ycoordinate=Ycoordinate+(toll)*rand(DATA.nvars,1);
+Zcoordinate=Zcoordinate+(toll)*rand(DATA.nvars,1);
 
 
 % Genenrate colormap based on pseudotime
@@ -250,10 +254,44 @@ if ishandle(103)
 clf(103)
 end
 hfig=figure(103);
+
+XData=x_center';
+YData=Results.TRANSITION.y_center';
+ZData=Results.TRANSITION.z_center';
+
+% Place cells on the progression graph
+xnew=interp1([1 100],[YData(edges_of_cell(:,1)); YData(edges_of_cell(:,2))],1:100);
+A=xnew';
+B=placement';
+I = (1 : size(A, 1)) .';
+J = reshape(B, [], 1);
+k = sub2ind(size(A), I, J);
+Ycoordinate=A(k);
+
+xnew=interp1([1 100],[XData(edges_of_cell(:,1));XData(edges_of_cell(:,2))],1:100);
+A=xnew';
+Xcoordinate=A(k);
+
+
+xnew=interp1([1 100],[ZData(edges_of_cell(:,1));ZData(edges_of_cell(:,2))],1:100);
+A=xnew';
+Zcoordinate=A(k);
+TH = 2*pi*rand(DATA.nvars,1);
+PH = asin(-1+2*rand(DATA.nvars,1));
+radii =0.2*(rand(DATA.nvars,1).^(1/3));
+[Xnoise,Ynoise,Znoise] = sph2cart(TH,PH,radii);
+Xcoordinate=Xcoordinate+Xnoise/8;
+Ycoordinate=Ycoordinate+Ynoise;
+Zcoordinate=Zcoordinate+Znoise;
+
+% figure
+% plot(Xcoordinate,Ycoordinate,'o')
+%scatter3(Xcoordinate,Ycoordinate,Zcoordinate, 30, Results.ORDERING.orderingCOLORMARK, 'fill')
+
 % az=-37.5000;
 % el=30;
 for k=1:Results.expected_clusters
-    scatter3(normed_cell_ordering(Results.final_groups==Results.cluster_predicted(k))',Results.score3(Results.final_groups==Results.cluster_predicted(k),1),Results.score3(Results.final_groups==Results.cluster_predicted(k),2),30,Results.colorMARK_calista(k,:),'fill')
+    scatter3(Xcoordinate(Results.final_groups==Results.cluster_predicted(k))',Ycoordinate(Results.final_groups==Results.cluster_predicted(k)),Zcoordinate(Results.final_groups==Results.cluster_predicted(k)),30,Results.colorMARK_calista(k,:),'fill')
     hold on
 end
 grid on

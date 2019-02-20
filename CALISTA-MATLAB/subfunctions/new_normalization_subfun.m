@@ -383,6 +383,7 @@ DATA.num_time_points=length(DATA.time);
 sortTOTdata=[];
 sortTIMELINE=[];
 idx_sorted_cells=[];
+cutDIMENSION=[];
 for k=1:DATA.num_time_points
     I=find(timeline==DATA.time(k));
     idx_sorted_cells=[idx_sorted_cells; I];
