@@ -1,0 +1,49 @@
+Package: calista
+Type: Package
+Title: Cell clustering, Lineage Inferece, Cell Ordering and Pseudotime for single-cell transcriptional data
+Version: 1.2.0
+Date: 2019-02-20
+Authors: Nan Papili Gao and Rudiyanto Guanwan
+Maintainer: Rudiyanto Gunawan <rgunawan@buffalo.edu> and Nan Papili Gao <nanp@ethz.ch>
+Description: CALISTA (Clustering and Lineage Inference in Single-Cell Transcriptional Analysis) is
+            a numerically efficient and highly scalable toolbox for an end-to-end analysis of single-cell transcriptomic profiles. 
+            CALISTA includes four essential single-cell analyses for cell differentiation studies, including single-cell clustering, 
+            reconstruction of cell lineage specification, transition gene identification, and cell pseudotime ordering. 
+Depends: R (>= 3.5.2)
+License: BSD 3-Clause Style License
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1.9000
+Imports:
+    parallel,
+    tools,
+    R.matlab,
+    doParallel,
+    foreach,
+    Matrix,
+    ClusterR,
+    cluster,
+    tsne,
+    expm,
+    Rcpp,
+    openxlsx,
+    data.table,
+    tools,
+    scatterplot3d,
+    plot3D,
+    rgl,
+    ggplot2,
+    igraph,
+    gridExtra,
+    primes,
+    numbers,
+    matrixStats,
+    TTR,
+    ppcor,
+    Hmisc,
+    fields,
+    gplots,
+    plotly,
+    RColorBrewer,
+    shiny,
+    shinyjs
