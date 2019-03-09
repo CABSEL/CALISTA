@@ -221,6 +221,19 @@ if ~isfield(INPUTS,'remove_batch_effects')
     INPUTS.remove_batch_effects=0;
 end
 
+if INPUTS.format_data==8
+    if ~isfield(INPUTS.loom_opts,'time_info')
+        INPUTS.loom_opts.time_info='Timepoint';
+    end
+    if ~isfield(INPUTS.loom_opts,'cell_id')
+        INPUTS.loom_opts.cell_id='CellID';
+    end
+    if ~isfield(INPUTS.loom_opts,'gene_name')
+        INPUTS.loom_opts.gene_name='Gene';
+    end
+    
+end
+
 %% UPLOADING
 
 [DATA]=new_normalization(INPUTS);

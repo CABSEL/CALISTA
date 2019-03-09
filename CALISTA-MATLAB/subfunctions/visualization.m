@@ -129,9 +129,9 @@ if INPUTS.plot_tsne==1
     subplot(121)
     for i=1:DATA.num_time_points
         scatter(score2(DATA.timeline==DATA.time(i),1), score2(DATA.timeline==DATA.time(i),2),dot_size(DATA.timeline==DATA.time(i)),colorMARK_time(i,:),'fill')
-        xlabel('PC1')
-        ylabel('PC2')
-        zlabel('PC3')
+        xlabel('TSNE1')
+        ylabel('TSNE2')
+        %zlabel('PC3')
         title('Original time/cell stage info')
         grid on
         hold on

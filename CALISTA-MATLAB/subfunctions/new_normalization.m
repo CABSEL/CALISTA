@@ -192,30 +192,37 @@ switch format_data
             match_row_attrs=ismember(info.Groups(ii).Name,'/row_attrs');
             if sum(match_col_attrs)==length(match_col_attrs)
                 for iii=1:size(info.Groups(ii).Datasets,1)
-                     match_cellID=ismember(info.Groups(ii).Datasets(iii).Name,'CellID');
+                     match_cellID=ismember(info.Groups(ii).Datasets(iii).Name,INPUTS.loom_opts.cell_id);
                       if sum(match_cellID)==length(match_cellID)
-                          cell_ID=h5read(filename,'/col_attrs/CellID');
+                          cell_ID=h5read(filename,fullfile('/col_attrs',INPUTS.loom_opts.cell_id));
                       end
                       
-                       match_time_info=ismember(info.Groups(ii).Datasets(iii).Name,'Timepoint');
+                       match_time_info=ismember(info.Groups(ii).Datasets(iii).Name,INPUTS.loom_opts.time_info);
                       if sum(match_time_info)==length(match_time_info)
-                          timeline=h5read(filename,'/col_attrs/Timepoint');
+                          timeline=double(h5read(filename,fullfile('/col_attrs',INPUTS.loom_opts.time_info)));
+                          if size(timeline,1)<size(timeline,2)
+                              timeline=timeline';
+                          end
                       end
                 end
+                
             end
             if sum(match_row_attrs)==length(match_row_attrs)
                 for iii=1:size(info.Groups(ii).Datasets,1)
-                     match_gene=ismember(info.Groups(ii).Datasets(iii).Name,'Gene');
+                     match_gene=ismember(info.Groups(ii).Datasets(iii).Name,INPUTS.loom_opts.gene_name);
                       if sum(match_gene)==length(match_gene)
-                          DATA.genes = h5read(filename,'/row_attrs/Gene');
+                          DATA.genes = h5read(filename,fullfile('/row_attrs',INPUTS.loom_opts.gene_name));
                       end
                 end
             end
         end
         
+        
         imported_data.info=info;
         
-        
+        if length(cell_ID)~=size(totDATA,1)
+            cell_ID=cellstr(num2str([1:size(totDATA,1)]'));
+        end
         if isempty(timeline)
             timeline=zeros(size(totDATA,1),1);
         end

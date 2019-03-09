@@ -54,12 +54,13 @@ else
                 while(~exit_while)                    
                     [~,idx_thr]=max(temp_occurrence_tot_time);
                     [~, idx_edge_to_check]=ismember([idx_thr idx_actual_clusters(k)],nodes(:,1:2),'rows');
-                    if TF(idx_edge_to_check)==0
+                    if TF(idx_edge_to_check)==0 | sum(temp_occurrence_tot_time)==0
                         exit_while=1;
                     else
                          temp_occurrence_tot_time(idx_thr)=0; %find the next max
                     end
                 end
+                if sum(temp_occurrence_tot_time)~=0
                 thr=find(unique_cluster_progression==cluster_progression(idx_thr));
                 idx_previous_clusters=find(cluster_progression<unique_cluster_progression(j) & cluster_progression>=unique_cluster_progression(max(1,thr)));
                 target=find(nodes(:,2)==idx_actual_clusters(k));
@@ -71,6 +72,7 @@ else
                 jj_tot=[jj_tot jj];
                 NumberOfEdges=NumberOfEdges+1;
                 nodes_added=[ nodes_added; nodes(jj,:)];
+                end
             end
             
         end
