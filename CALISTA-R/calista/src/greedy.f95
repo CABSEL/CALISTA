@@ -506,7 +506,6 @@ subroutine	greedy_cabsel_f(as_all,log_p_mat_ma,k_new, &
 									aaa(:) = 0
 									bbb(:,:) = 0
 									call myfind(i,q,as,nvars,aaa)
-									!call myshape1(i,cell_prob,expected_clusters,q,aaa,bbb)
 									do j = 1,q
 										bbb(j,:) = cell_prob(aaa(j),i)
 									end do
@@ -704,20 +703,6 @@ end do
 
 end subroutine myfind		
 
-!----------------------------------------------------------------------------------------------!
-!-------------------------------------------Repmat1--------------------------------------------!
-!----------------------------------------------------------------------------------------------!
-
-subroutine myshape1(i,cell_prob,expected_clusters,q,aaa,bbb)
-
-integer i,j,k,q,expected_clusters,aaa(q)
-real*8 cell_prob(nvars,expected_clusters), bbb(q,expected_clusters)
-
-do j = 1,q
-	bbb(j,:) = cell_prob(aaa(j),i)
-end do
-
-end subroutine myshape1
 
 !----------------------------------------------------------------------------------------------!
 !-------------------------------------------Repmat2--------------------------------------------!
